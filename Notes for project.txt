@@ -1,0 +1,100 @@
+Things to search for capstone:
+
+hope to use:
+value before building of stadium
+value after building of stadium
+natural disasters in area
+flood planes
+crime rates 
+tax rates 
+school ratings
+
+found:
+median household income
+median house values
+
+need to decide:
+
+how many houses and what specific location from the stadium are they located.
+The pages that we should require.
+The look.
+How to split up the tasks?
+All do the research and data.
+size of properties
+use average price of houses in that school district or area
+leave some cities out of learning data to see if predictions are working. 
+
+Questions:
+
+how to format data to input to machine?
+
+how to use census website api?
+
+how are we going to use mysql bc of firewall at school?
+
+oracel database?
+
+can we just give it the mean value per year before and after?
+
+how do we tell it the year the stadium was built in each zip code?
+
+will this automatically take inflation into account for these areas or will the machine only provide an increase due 
+directly to the stadium? for example, will it be like this machine calculated that on top of current housing trends 
+this house will be worth 5% more or 5% less dues to the stadium. Do we need to teach it general market trends?
+
+notes:
+program we need a variable that will hold the stadium opening dates to setup as split point
+csv file with the dates for each city stadium opening day
+6 months before opening and 6 months after
+variable for how many months before and after opening to receive data for
+weed out years where it was rented
+
+find out easier way to obtain county numbers for the cities we need for 1 year acs
+
+useful info:
+
+https://www.census.gov/content/dam/Census/programs-surveys/acs/guidance/training-presentations/20180614_API.pdf
+https://factfinder.census.gov/faces/nav/jsf/pages/guided_search.xhtml#none
+http://cumberlandgis.maps.arcgis.com/apps/webappviewer/index.html?id=a6ea68995c2349e9a177366288589be7
+Zillow get deep results = current house information.
+https://api.census.gov/data/2017/acs/acs5/profile?get=DP04_0089E,NAME&for=zip%20code%20tabulation%20area:28312
+
+https://docs.sqlalchemy.org/en/latest/core/engines.html
+
+**need to find way to get state and county numbers quickly (place in database?)
+
+Format= 
+https://api.census.gov/data/2011/acs/acs1/subject?get=S1501_C01_001E,NAME&for=county:051&in=state:37
+S1501_C01_018E = % of people with ed level of high school or higher
+S1902_C01_001E = mean income
+S1903_C01_001E = median income
+S1701_C01_001E = number of people in poverty status
+
+Format = https://api.census.gov/data/2011/acs/acs1/profile?get=DP03_0001E,DP03_0002E,DP04_0089E,NAME&for=county:051&in=state:37
+DP04_0088E = median Value of houses 
+DP03_0002E = number of people in labor force
+DP03_0062E = median household income
+DP03_0086E = median family income
+DP03_0090E = median non family income
+DP03_0092E = Median earnings for workers
+DP05_0017E = median age
+
+Format = https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:* (doesn’t have word profile)
+B01003_001E = total population
+B25103_001E = median real estate tax
+B25105_001E = median monthly household costs
+C25075_001E = total number of houses in area
+
+If table starts with D (word profile after acs1/) 
+If table starts with S (word subject after acs1/)
+If table starts with B (no word after acs1/)
+
+Couldn’t find crime rates or school ratings in census but I think this is enough to start with
+
+
+ToDo:
+find one year versions of census tables for median household values and household incomes for zipcodes
+watch video mallory sent me
+try to work on login
+look up stadiums between 2012-2014 get zip codes
+census data online goes from 2009-2017
