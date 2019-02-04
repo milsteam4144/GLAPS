@@ -40,7 +40,6 @@ class Attributes(Base):
     year = Column('year', Integer, primary_key = True)
     stadium = Column('stadium', String(40), primary_key = True)
     population = Column('population', Integer)
-    highSchoolGrads = Column('highSchoolGrads', Integer)
     meanIncome = Column('meanIncome', Integer)
     medianIncome = Column('medianIncome', Integer)
     povertyPop = Column('povertyPop', Integer)
@@ -55,13 +54,12 @@ class Attributes(Base):
     medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
     totalHouses = Column('totalHouses', Integer)
     
-    def __init__(self, year, stadium, highSchoolGrads,meanIncome,medianIncome,povertyPop,medianHomeVal,
+    def __init__(self, year, stadium,meanIncome,medianIncome,povertyPop,medianHomeVal,
                  workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,
                  medianAge,population,medianRealEstateTax,medianHouseholdCosts,totalHouses):
         
         self.year = year
         self.stadium = stadium
-        self.perHighSchoolGrads= highSchoolGrads
         self.meanIncome = meanIncome
         self.medianIncome = medianIncome
         self.povertyPop = povertyPop
@@ -78,7 +76,7 @@ class Attributes(Base):
         self.totalHouses = totalHouses
 
 # Create the table
-Base.metadata.create_all(engine)
+#Base.metadata.create_all(engine)
     
 """  
 jimmystadium = session.query(zipCodes).filter_by(ZipCode = 48317).one() #This returns the item from the table as an object
@@ -92,18 +90,28 @@ years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
 #______________________________ LOOK HERE
 
 atList = []
+atList1 = []
+atList2 = []
+
+censusList = []
+
+for row1 in session.query(censusTables).all():
+    censusList.append(row1.TableNames)
+    
+print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
 
 row = session.query(zipCodes).filter_by(ZipCode= '48317').first()
 
+
+#for row in session.query(zipCodes).all():
 for year in years:
-    for row1 in session.query(censusTables).all():
-        atList.append(getCensusData(year, row.County, row.State, row1.TableNames))
-        
-        print(str(year), row.Stadium,atList[0][0])#,atList[0][1],atList[0][2],atList[0][3],atList[1][0],atList[1][1],atList[1][2],atList[1][3],atList[1][4],atList[1][5],atList[1][6],atList[2][0],atList[2][1],atList[2][3])
-        
-        
-        
-        
+    meanIncome, medianIncome, povertyPop = getCensusData(year, row.County, row.State, censusList[0])
+    medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge = getCensusData(year, row.County, row.State, censusList[1])
+    population,medianRealEstateTax,medianHouseholdCosts,totalHouses = getCensusData(year, row.County, row.State, censusList[2])
+    
+    print(year, meanIncome, medianIncome, povertyPop) 
+    print(year, medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge)
+    print(year, population,medianRealEstateTax,medianHouseholdCosts,totalHouses )       
         
         #print (row.Stadium, year, getPop(year, countyName=row.County, state = row.State))
         #new = Attributes(str(year), row.Stadium, atList[0][0],  atList[0][1],
