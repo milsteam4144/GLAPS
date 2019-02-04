@@ -87,8 +87,6 @@ print(jimmystadium.City) #Then you can access it's attributes directly
 # A list of years that we need data for
 years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
 
-#______________________________ LOOK HERE
-
 atList = []
 atList1 = []
 atList2 = []
@@ -98,17 +96,19 @@ censusList = []
 for row1 in session.query(censusTables).all():
     censusList.append(row1.TableNames)
     
-print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
-
-row = session.query(zipCodes).filter_by(ZipCode= '48317').first()
+#print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
 
 
-#for row in session.query(zipCodes).all():
-for year in years:
-    meanIncome, medianIncome, povertyPop = getCensusData(year, row.County, row.State, censusList[0])
-    medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge = getCensusData(year, row.County, row.State, censusList[1])
-    population,medianRealEstateTax,medianHouseholdCosts,totalHouses = getCensusData(year, row.County, row.State, censusList[2])
-    
+for row in session.query(zipCodes).all():
+    for year in years:
+        meanIncome, medianIncome, povertyPop = getCensusData(year, row.County, row.State, censusList[0])
+        #subject table
+        medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge = getCensusData(year, row.County, row.State, censusList[1])
+        #data_profile table
+        population,medianRealEstateTax,medianHouseholdCosts,totalHouses = getCensusData(year, row.County, row.State, censusList[2])
+        #detailed_tables
+
+    """
     print(year, meanIncome, medianIncome, povertyPop) 
     print(year, medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge)
     print(year, population,medianRealEstateTax,medianHouseholdCosts,totalHouses )       
@@ -122,7 +122,7 @@ for year in years:
 
     #for row in session.query(zipCodes).filter_by(ZipCode= '48317').first():
 
-
+"""
 
 
 
