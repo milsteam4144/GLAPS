@@ -33,16 +33,34 @@ zipCodes = Table('ZipCodes', metadata, autoload = True, autoload_with=engine)
 censusTables = Table('CensusTables',metadata, autoload = True, autoload_with=engine)
 #print(zipCodes.columns)
 
-# A table that gives the population of a stadium's county
-class Attributes(Base):
+#The following are three tables with various attributes (columns)
+
+class Subject_T(Base):
     
-    __tablename__ = "Attributes"
+    __tablename__ = "Subject"
     year = Column('year', Integer, primary_key = True)
-    stadium = Column('stadium', String(40), primary_key = True)
-    population = Column('population', Integer)
+    stadiumName = Column('stadium', String(40), primary_key = True)
+    stadiumID = Column(Integer, ForeignKey("ZipCodes.ID"), nullable=False)
     meanIncome = Column('meanIncome', Integer)
     medianIncome = Column('medianIncome', Integer)
     povertyPop = Column('povertyPop', Integer)
+    
+    
+    def __init__(self, year, stadiumName, stadiumID, meanIncome,medianIncome,povertyPop):
+        
+        self.year = year
+        self.stadiumName = stadiumName
+        self.stadiumID = stadiumID
+        self.meanIncome = meanIncome
+        self.medianIncome = medianIncome
+        self.povertyPop = povertyPop
+        
+class Data_Profile_T(Base):
+    
+    __tablename__ = "Data_Profile"
+    year = Column('year', Integer, primary_key = True)
+    stadiumName = Column('stadium', String(40), primary_key = True)
+    stadiumID = Column(Integer, ForeignKey("ZipCodes.ID"), nullable=False)
     medianHomeVal= Column('medianHomeVal', Integer)
     workers = Column('workers', Integer)
     medianHouseIncome = Column('medianHouseIncome', Integer)
@@ -50,19 +68,14 @@ class Attributes(Base):
     medianNonFamIncome = Column('medianNonFamIncome', Integer)
     medianWorkerIncome = Column('medianWorkerIncome', Integer)
     medianAge = Column('medianAge', Integer)
-    medianRealEstateTax = Column('medianRealEstateTax', Integer)
-    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
-    totalHouses = Column('totalHouses', Integer)
     
-    def __init__(self, year, stadium,meanIncome,medianIncome,povertyPop,medianHomeVal,
-                 workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,
-                 medianAge,population,medianRealEstateTax,medianHouseholdCosts,totalHouses):
+    
+    def __init__(self, year, stadiumName, stadiumID, medianHomeVal, \
+                 workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome, medianAge):
         
         self.year = year
-        self.stadium = stadium
-        self.meanIncome = meanIncome
-        self.medianIncome = medianIncome
-        self.povertyPop = povertyPop
+        self.stadiumName = stadiumName
+        self.stadiumID = stadiumID
         self.medianHomeVal = medianHomeVal
         self.workers = workers
         self.medianHouseIncome = medianHouseIncome
@@ -70,13 +83,32 @@ class Attributes(Base):
         self.medianNonFamIncome = medianNonFamIncome
         self.medianWorkerIncome = medianWorkerIncome
         self.medianAge = medianAge
+        
+class Detailed_T(Base):
+    
+    __tablename__ = "Detailed"
+    year = Column('year', Integer, primary_key = True)
+    stadiumName = Column('stadium', String(40), primary_key = True)
+    stadiumID = Column(Integer, ForeignKey("ZipCodes.ID"), nullable=False)
+    population = Column('population', Integer)
+    medianRealEstateTax = Column('medianRealEstateTax', Integer)
+    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
+    totalHouses = Column('totalHouses', Integer)
+
+    
+    
+    def __init__(self, year, stadiumName, stadiumID, population,medianRealEstateTax,medianHouseholdCosts,totalHouses):
+        
+        self.year = year
+        self.stadiumName = stadiumName
+        self.stadiumID = stadiumID
         self.population = population
         self.medianRealEstateTax = medianRealEstateTax
         self.medianHouseholdCosts = medianHouseholdCosts
         self.totalHouses = totalHouses
-
-# Create the table
-#Base.metadata.create_all(engine)
+       
+# Create the tables
+Base.metadata.create_all(engine)
     
 """  
 jimmystadium = session.query(zipCodes).filter_by(ZipCode = 48317).one() #This returns the item from the table as an object
@@ -102,11 +134,18 @@ for row1 in session.query(censusTables).all():
 for row in session.query(zipCodes).all():
     for year in years:
         meanIncome, medianIncome, povertyPop = getCensusData(year, row.County, row.State, censusList[0])
-        #subject table
+        new = Subject_T(year, row.Stadium, row.ID, meanIncome, medianIncome, povertyPop)
+        session.add(new)
+        
         medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge = getCensusData(year, row.County, row.State, censusList[1])
-        #data_profile table
+        new = Data_Profile_T(year, row.Stadium, row.ID, medianHomeVal,workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome, medianAge)
+        session.add(new)
+        
         population,medianRealEstateTax,medianHouseholdCosts,totalHouses = getCensusData(year, row.County, row.State, censusList[2])
-        #detailed_tables
+        new = Detailed_T(year, row.Stadium, row.ID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses)
+        session.add(new)
+    session.commit()
+    session.flush()
 
     """
     print(year, meanIncome, medianIncome, povertyPop) 
