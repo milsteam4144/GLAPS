@@ -11,7 +11,6 @@ from sqlalchemy.orm import relationship, backref
 import logging
 from sqlalchemy.orm import sessionmaker
 from apis import getCountyCode, getCensusData
-from table_classes import eduPoverty_row
 
 
 path = os.path.abspath("MinorLeague.db")
