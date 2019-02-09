@@ -43,9 +43,9 @@ class Subject_T(Base):
     meanIncome = Column('meanIncome', Integer)
     medianIncome = Column('medianIncome', Integer)
     povertyPop = Column('povertyPop', Integer)
+    medianAge = Column('medianAge', Integer)
     
-    
-    def __init__(self, year, stadiumName, stadiumID, meanIncome,medianIncome,povertyPop):
+    def __init__(self, year, stadiumName, stadiumID, meanIncome,medianIncome,povertyPop,medianAge):
         
         self.year = year
         self.stadiumName = stadiumName
@@ -53,6 +53,8 @@ class Subject_T(Base):
         self.meanIncome = meanIncome
         self.medianIncome = medianIncome
         self.povertyPop = povertyPop
+        self.medianAge = medianAge
+        
         
 class Data_Profile_T(Base):
     
@@ -60,28 +62,24 @@ class Data_Profile_T(Base):
     year = Column('year', Integer, primary_key = True)
     stadiumName = Column('stadium', String(40), primary_key = True)
     stadiumID = Column(Integer, ForeignKey("ZipCodes.ID"), nullable=False)
-    medianHomeVal= Column('medianHomeVal', Integer)
     workers = Column('workers', Integer)
     medianHouseIncome = Column('medianHouseIncome', Integer)
     medianFamilyIncome = Column('medianFamilyIncome', Integer)
     medianNonFamIncome = Column('medianNonFamIncome', Integer)
     medianWorkerIncome = Column('medianWorkerIncome', Integer)
-    medianAge = Column('medianAge', Integer)
     
     
-    def __init__(self, year, stadiumName, stadiumID, medianHomeVal, \
-                 workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome, medianAge):
+    def __init__(self, year, stadiumName, stadiumID, \
+                 workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome):
         
         self.year = year
         self.stadiumName = stadiumName
         self.stadiumID = stadiumID
-        self.medianHomeVal = medianHomeVal
         self.workers = workers
         self.medianHouseIncome = medianHouseIncome
         self.medianFamilyIncome = medianFamilyIncome
         self.medianNonFamIncome = medianNonFamIncome
         self.medianWorkerIncome = medianWorkerIncome
-        self.medianAge = medianAge
         
 class Detailed_T(Base):
     
@@ -93,10 +91,12 @@ class Detailed_T(Base):
     medianRealEstateTax = Column('medianRealEstateTax', Integer)
     medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
     totalHouses = Column('totalHouses', Integer)
+    medianHomeVal= Column('medianHomeVal', Integer)
 
     
     
-    def __init__(self, year, stadiumName, stadiumID, population,medianRealEstateTax,medianHouseholdCosts,totalHouses):
+    def __init__(self, year, stadiumName, stadiumID, population\
+                 ,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal):
         
         self.year = year
         self.stadiumName = stadiumName
@@ -105,6 +105,7 @@ class Detailed_T(Base):
         self.medianRealEstateTax = medianRealEstateTax
         self.medianHouseholdCosts = medianHouseholdCosts
         self.totalHouses = totalHouses
+        self.medianHomeVal = medianHomeVal
        
 # Create the tables
 Base.metadata.create_all(engine)
@@ -128,16 +129,16 @@ for row1 in session.query(censusTables).all():
 
 for row in session.query(zipCodes).all():
     for year in years:
-        meanIncome, medianIncome, povertyPop = getCensusData(year, row.County, row.State, censusList[0])
-        new = Subject_T(year, row.Stadium, row.ID, meanIncome, medianIncome, povertyPop)
+        meanIncome, medianIncome, povertyPop, medianAge = getCensusData(year, row.County, row.State, censusList[0])
+        new = Subject_T(year, row.Stadium, row.ID, meanIncome, medianIncome, povertyPop, medianAge)
         session.add(new)
         
-        medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge = getCensusData(year, row.County, row.State, censusList[1])
-        new = Data_Profile_T(year, row.Stadium, row.ID, medianHomeVal,workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome, medianAge)
+        workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getCensusData(year, row.County, row.State, censusList[1])
+        new = Data_Profile_T(year, row.Stadium, row.ID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
         session.add(new)
         
-        population,medianRealEstateTax,medianHouseholdCosts,totalHouses = getCensusData(year, row.County, row.State, censusList[2])
-        new = Detailed_T(year, row.Stadium, row.ID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses)
+        population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getCensusData(year, row.County, row.State, censusList[2])
+        new = Detailed_T(year, row.Stadium, row.ID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
         session.add(new)
     session.commit()
     session.flush()
