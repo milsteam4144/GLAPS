@@ -68,22 +68,23 @@ https://api.census.gov/data/2011/acs/acs1/subject?get=S1501_C01_001E,NAME&for=co
 S1501_C01_018E = % of people with ed level of high school or higher
 S1902_C01_001E = mean income
 S1903_C01_001E = median income
-S1701_C01_001E = number of people in poverty status
+S1701_C01_034E = number of people in poverty status
+S0101_C01_030E = median age
 
 Format = https://api.census.gov/data/2011/acs/acs1/profile?get=DP03_0001E,DP03_0002E,DP04_0089E,NAME&for=county:051&in=state:37
-DP04_0088E = median Value of houses 
 DP03_0002E = number of people in labor force
 DP03_0062E = median household income
 DP03_0086E = median family income
 DP03_0090E = median non family income
 DP03_0092E = Median earnings for workers
-DP05_0017E = median age
+
 
 Format = https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:* (doesn’t have word profile)
 B01003_001E = total population
 B25103_001E = median real estate tax
 B25105_001E = median monthly household costs
 C25075_001E = total number of houses in area
+B25077_001E =  median home values
 
 If table starts with D (word profile after acs1/) 
 If table starts with S (word subject after acs1/)
