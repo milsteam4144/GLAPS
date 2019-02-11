@@ -127,9 +127,6 @@ class Locations(Base):
 # Create the tables
 Base.metadata.create_all(engine)
 
-
-
-
        
 # A list of years that we need data for
 years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
@@ -142,7 +139,10 @@ for row1 in session.query(censusTables).all():
 #print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
 
 allCounties = getAllCounties()
-    
+
+print(allCounties)
+
+"""    
 for key in allCounties: 
     x +=1
     new = Locations(locationID = x, countyCode = allCounties[key], stateCode = key, stadiumExists = 0)
@@ -150,7 +150,7 @@ for key in allCounties:
 
 session.commit()
 session.flush()
-  
+
 for row in session.query(Locations).all():
     for year in years:
         meanIncome, medianIncome, povertyPop, medianAge = getCensusData(year, row.countyCode, row.stateCode, censusList[0])
@@ -167,7 +167,7 @@ for row in session.query(Locations).all():
     
 session.commit()
 session.flush()
-
+"""
     
 """
     print(year, meanIncome, medianIncome, povertyPop) 

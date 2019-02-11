@@ -14,8 +14,8 @@ from sqlalchemy.orm import sessionmaker
 
 def getCountyCode():
     
-    stadiumCountyStateCodes = {}
-    
+    stadiumCountyStateCodes = []
+    state_county=[]
     path = os.path.abspath("MinorLeague.db")
     #dir_path = os.path.dirname(os.path.realpath("/MinorLeague/MinorLeague.db"))
     #Define declarative base class
@@ -41,13 +41,17 @@ def getCountyCode():
     for row in session.query(stadiums).all():  
         for item in list(responseJson):
             if item[0] == str(row.County) + " County, " + str(row.State):
-                stadiumCountyStateCodes[item[2]]=item[3]
-                return stadiumCountyStateCodes
-
+                state_county.append(item[2])
+                state_county.append(item[3])
+                stadiumCountyStateCodes.append(state_county)
+    
+    return stadiumCountyStateCodes
+    print(stadiumCountyStateCodes)
+    
 def countyCodesRandom():
-    countyStateDict = {}
-    counties = []
+    countyStateList = []
     states = []
+    state_county = []
     i = 1
     
     url = requests.get("https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:*&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
@@ -57,44 +61,52 @@ def countyCodesRandom():
     while i<=56:
         if i == 3 or i == 7 or i == 14 or i == 43 or i == 52:
             i += 1
-        if i < 10:
-            i = '0'+str(i)
-        states.append(str(i))
-        i = int(i) +1  
-
+        states.append(i)
+        i+=1
+          
     for state in states:
         x = random.randint(1,300)
         
-        if x < 100:
-            if x < 10:
-                x = "00"+str(x)
-            else:
-                x = "0"+str(x)
-        else:       
-            x = str(x)
-        counties.append(x)  
+        state_county.append(state)
+        state_county.append(x)
+        countyStateList.append(state_county)
     
-    countyStateDict = dict(zip(states,counties))
-    
-    for key in countyStateDict:
+    for pair in countyStateList:
         for item in responseJson:
-            while key == item[2] and countyStateDict[key] != item[3]:
-                countyStateDict[key] = random.randint(1,300)
+            while pair[0] == item[2] and pair[1] != item[3]:
+                pair[1]= random.randint(1,300)
     
-    return countyStateDict
-    #print (countyStateDict) 
+    for item in countyStateList:
+        if int(item[1]) < 100:
+            if int(item[1]) < 10:
+                item[1] = '00'+str(item[1])
+            else:
+                item[1]= '0'+str(item[1])
+        else:
+            item[1] = str(item[1])
+        if int(item[0]) < 10:
+            item[0] = '0'+str(item[0])
+        else:
+            item[0] = str(item[0])
+
+        state_county.append(item[0])
+        state_county.append(item[1])
+        countyStateList.append(state_county)
+        
+    return countyStateList
+    print (countyStateList) 
 
 def getAllCounties():
     
-    allCounties = {}
+    allCounties = []
     
-    dicts0 = getCountyCode()
-    dicts1 = countyCodesRandom()
-    dicts2 = countyCodesRandom()
-   
-    allCounties.update(dicts0)
-    allCounties.update(dicts1)
-    allCounties.update(dicts2)
+    list0 = getCountyCode()
+    list1 = countyCodesRandom()
+    list2 = countyCodesRandom()
+
+    allCounties.append(list0)
+    allCounties.append(list1)
+    allCounties.append(list2)
         
     return allCounties
     
