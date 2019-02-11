@@ -10,7 +10,7 @@ from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
 import logging
 from sqlalchemy.orm import sessionmaker
-from apis import getCountyCode, getCensusData
+from apis import getCountyCode, getStadiumCensusData, getRandomCensusData
 
 
 path = os.path.abspath("MinorLeague.db")
@@ -129,21 +129,37 @@ for row1 in session.query(censusTables).all():
 
 for row in session.query(zipCodes).all():
     for year in years:
-        meanIncome, medianIncome, povertyPop, medianAge = getCensusData(year, row.County, row.State, censusList[0])
+        meanIncome, medianIncome, povertyPop, medianAge = getStadiumCensusData(year, row.County, row.State, censusList[0])
         new = Subject_T(year, row.Stadium, row.ID, meanIncome, medianIncome, povertyPop, medianAge)
         session.add(new)
         
-        workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getCensusData(year, row.County, row.State, censusList[1])
+        workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getStadiumCensusData(year, row.County, row.State, censusList[1])
         new = Data_Profile_T(year, row.Stadium, row.ID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
         session.add(new)
         
-        population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getCensusData(year, row.County, row.State, censusList[2])
+        population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getStadiumCensusData(year, row.County, row.State, censusList[2])
         new = Detailed_T(year, row.Stadium, row.ID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
         session.add(new)
     session.commit()
     session.flush()
 
-    """
+for year in years:
+    meanIncome, medianIncome, povertyPop, medianAge = getRandomCensusData(year, censusList[0])
+    new = Subject_T(year, row.Stadium, row.ID, meanIncome, medianIncome, povertyPop, medianAge)
+    session.add(new)
+        
+    workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getRandomCensusData(year,censusList[1])
+    new = Data_Profile_T(year, row.Stadium, row.ID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
+    session.add(new)
+        
+    population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getRandomCensusData(year,censusList[2])
+    new = Detailed_T(year, row.Stadium, row.ID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+    session.add(new)
+    
+session.commit()
+session.flush()
+    
+"""
     print(year, meanIncome, medianIncome, povertyPop) 
     print(year, medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge)
     print(year, population,medianRealEstateTax,medianHouseholdCosts,totalHouses )       
