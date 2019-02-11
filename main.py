@@ -27,29 +27,29 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-#Upload the ZipCodes table as a Table object
-zipCodes = Table('ZipCodes', metadata, autoload = True, autoload_with=engine)
+#Upload the Stadiums table as a Table object
+stadiums = Table('Stadiums', metadata, autoload = True, autoload_with=engine)
 censusTables = Table('CensusTables',metadata, autoload = True, autoload_with=engine)
-#print(zipCodes.columns)
+#print(stadiums.columns)
 
 #The following are three tables with various attributes (columns)
 
 class Subject_T(Base):
     
     __tablename__ = "Subject"
-    year = Column('year', Integer, primary_key = True)
-    stadiumName = Column('stadium', String(40), primary_key = True)
-    stadiumID = Column(Integer, ForeignKey("ZipCodes.ID"), nullable=False)
+    year = Column('year', Integer, primary_key = True, nullable=False)
+    locationID = Column(Integer, primary_key = True, nullable=False)
+    stadiumName = Column('stadiumName', String(40))
     meanIncome = Column('meanIncome', Integer)
     medianIncome = Column('medianIncome', Integer)
     povertyPop = Column('povertyPop', Integer)
     medianAge = Column('medianAge', Integer)
     
-    def __init__(self, year, stadiumName, stadiumID, meanIncome,medianIncome,povertyPop,medianAge):
+    def __init__(self, year, stadiumName, locationID, meanIncome,medianIncome,povertyPop,medianAge):
         
         self.year = year
         self.stadiumName = stadiumName
-        self.stadiumID = stadiumID
+        self.locationID = locationID
         self.meanIncome = meanIncome
         self.medianIncome = medianIncome
         self.povertyPop = povertyPop
@@ -59,9 +59,9 @@ class Subject_T(Base):
 class Data_Profile_T(Base):
     
     __tablename__ = "Data_Profile"
-    year = Column('year', Integer, primary_key = True)
-    stadiumName = Column('stadium', String(40), primary_key = True)
-    stadiumID = Column(Integer, ForeignKey("ZipCodes.ID"), nullable=False)
+    year = Column('year', Integer, primary_key = True, nullable=False)
+    locationID = Column(Integer, primary_key = True, nullable=False)
+    stadiumName = Column('stadium', String(40))
     workers = Column('workers', Integer)
     medianHouseIncome = Column('medianHouseIncome', Integer)
     medianFamilyIncome = Column('medianFamilyIncome', Integer)
@@ -69,12 +69,12 @@ class Data_Profile_T(Base):
     medianWorkerIncome = Column('medianWorkerIncome', Integer)
     
     
-    def __init__(self, year, stadiumName, stadiumID, \
+    def __init__(self, year, stadiumName, locationID, \
                  workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome):
         
         self.year = year
         self.stadiumName = stadiumName
-        self.stadiumID = stadiumID
+        self.locationID = locationID
         self.workers = workers
         self.medianHouseIncome = medianHouseIncome
         self.medianFamilyIncome = medianFamilyIncome
@@ -84,9 +84,9 @@ class Data_Profile_T(Base):
 class Detailed_T(Base):
     
     __tablename__ = "Detailed"
-    year = Column('year', Integer, primary_key = True)
-    stadiumName = Column('stadium', String(40), primary_key = True)
-    stadiumID = Column(Integer, ForeignKey("ZipCodes.ID"), nullable=False)
+    year = Column('year', Integer, primary_key = True, nullable=False)
+    locationID = Column(Integer, primary_key = True, nullable=False)
+    stadiumName = Column('stadium', String(40))
     population = Column('population', Integer)
     medianRealEstateTax = Column('medianRealEstateTax', Integer)
     medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
@@ -95,23 +95,38 @@ class Detailed_T(Base):
 
     
     
-    def __init__(self, year, stadiumName, stadiumID, population\
+    def __init__(self, year, stadiumName, locationID, population\
                  ,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal):
         
         self.year = year
         self.stadiumName = stadiumName
-        self.stadiumID = stadiumID
+        self.locationID = locationID
         self.population = population
         self.medianRealEstateTax = medianRealEstateTax
         self.medianHouseholdCosts = medianHouseholdCosts
         self.totalHouses = totalHouses
         self.medianHomeVal = medianHomeVal
+        
+class Locations(Base):
+    
+    __tablename__ = "Locations"
+    locationID = Column(Integer, primary_key = True, nullable=False)
+    countyCode = Column('CountyCode', Integer)
+    stateCode = Column('StateCode', Integer)
+    stadiumExists = Column('StadiumExists', Integer)
+    
+    def __init__(self, locationID, countyCode, stateCode, stadiumExists):
+        
+        self.locationID = locationID
+        self.countyCode = countyCode
+        self.stateCode = stateCode
+        self.stadiumExists = stadiumExists
        
 # Create the tables
 Base.metadata.create_all(engine)
     
 """  
-jimmystadium = session.query(zipCodes).filter_by(ZipCode = 48317).one() #This returns the item from the table as an object
+jimmystadium = session.query(stadiums).filter_by(ZipCode = 48317).one() #This returns the item from the table as an object
 print(jimmystadium.City) #Then you can access it's attributes directly
 """
        
@@ -127,37 +142,31 @@ for row1 in session.query(censusTables).all():
 #print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
 
 
-for row in session.query(zipCodes).all():
+for row in session.query(stadiums).all():
     for year in years:
+        
+        #Add Locations objects to Locations table
+        #variables = function(parameters)
+        new = Locations(locationID = NULL, countyCode, stateCode, stadiumExists)
+        session.add(new)
+        
         meanIncome, medianIncome, povertyPop, medianAge = getCensusData(year, row.County, row.State, censusList[0])
-        new = Subject_T(year, row.Stadium, row.ID, meanIncome, medianIncome, povertyPop, medianAge)
+        new = Subject_T(year, row.StadiumName, row.ID, meanIncome, medianIncome, povertyPop, medianAge)
         session.add(new)
         
         workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getCensusData(year, row.County, row.State, censusList[1])
-        new = Data_Profile_T(year, row.Stadium, row.ID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
+        new = Data_Profile_T(year, row.StadiumName, row.ID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
         session.add(new)
         
         population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getCensusData(year, row.County, row.State, censusList[2])
-        new = Detailed_T(year, row.Stadium, row.ID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+        new = Detailed_T(year, row.StadiumName, row.ID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
         session.add(new)
     session.commit()
     session.flush()
 
-    """
-    print(year, meanIncome, medianIncome, povertyPop) 
-    print(year, medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge)
-    print(year, population,medianRealEstateTax,medianHouseholdCosts,totalHouses )       
-        
-        #print (row.Stadium, year, getPop(year, countyName=row.County, state = row.State))
-        #new = Attributes(str(year), row.Stadium, atList[0][0],  atList[0][1],
-        #atList[0][2],  atList[0][3], atList[1][0], atList[1][1], atList[1][2], atList[1][3]
-        #, atList[1][4], atList[1][5], atList[1][6], atList[2][0], atList[2][1], atList[2][3])
-        #session.add(new) THIS LINE AND THE ONE BELOW IT SHOULD ADD THE DATA TO A NEW TABLE CALLED "POPULATION"
-        #session.commit() IT KEPT THROWING AN ERROR THAT DATABASE IS LOCKED
+    
+    #for row in session.query(stadiums).filter_by(ZipCode= '48317').first():
 
-    #for row in session.query(zipCodes).filter_by(ZipCode= '48317').first():
-
-"""
 
 
 
