@@ -126,6 +126,10 @@ class Locations(Base):
        
 # Create the tables
 Base.metadata.create_all(engine)
+
+
+
+
        
 # A list of years that we need data for
 years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
