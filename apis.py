@@ -11,7 +11,7 @@ from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
 import logging
 from sqlalchemy.orm import sessionmaker
-
+"""
 def getCountyCode():
     
     stadiumCountyStateCodes = []
@@ -47,68 +47,31 @@ def getCountyCode():
     
     return stadiumCountyStateCodes
     print(stadiumCountyStateCodes)
-    
+"""
 def countyCodesRandom():
-    countyStateList = []
-    states = []
-    state_county = []
-    i = 1
+    allStatesandCounties = []
+    state_county = ()
+    selectedLocations = []
+    
+    i = 0
     
     url = requests.get("https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:*&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
     responseJson = list(json.loads(url.text))
-    #print (responseJson)
-
-    while i<=56:
-        if i == 3 or i == 7 or i == 14 or i == 43 or i == 52:
-            i += 1
-        states.append(i)
-        i+=1
-          
-    for state in states:
-        x = random.randint(1,300)
-        
-        state_county.append(state)
-        state_county.append(x)
-        countyStateList.append(state_county)
     
-    for pair in countyStateList:
-        for item in responseJson:
-            while pair[0] == item[2] and pair[1] != item[3]:
-                pair[1]= random.randint(1,300)
+    for item in responseJson:
+        state_county = item[2],item[3]
+        allStatesandCounties.append(state_county)
     
-    for item in countyStateList:
-        if int(item[1]) < 100:
-            if int(item[1]) < 10:
-                item[1] = '00'+str(item[1])
-            else:
-                item[1]= '0'+str(item[1])
-        else:
-            item[1] = str(item[1])
-        if int(item[0]) < 10:
-            item[0] = '0'+str(item[0])
-        else:
-            item[0] = str(item[0])
-
-        state_county.append(item[0])
-        state_county.append(item[1])
-        countyStateList.append(state_county)
-        
-    return countyStateList
-    print (countyStateList) 
-
-def getAllCounties():
+    allStatesandCounties.pop(0)
     
-    allCounties = []
+    print(allStatesandCounties)
     
-    list0 = getCountyCode()
-    list1 = countyCodesRandom()
-    list2 = countyCodesRandom()
-
-    allCounties.append(list0)
-    allCounties.append(list1)
-    allCounties.append(list2)
-        
-    return allCounties
+    while i < 100:
+       x = random.randint(1,len(responseJson))
+       selectedLocations.append(allStatesandCounties[x])
+       i +=1
+    
+    return selectedLocations 
     
 def getCensusData(year, county, state, census_table):    
 

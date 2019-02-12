@@ -17,7 +17,7 @@ from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
 import logging
 from sqlalchemy.orm import sessionmaker
-from apis import getCountyCode, getCensusData, getAllCounties
+from apis import countyCodesRandom, getCensusData
 
 
 path = os.path.abspath("MinorLeague.db")
@@ -138,14 +138,13 @@ for row1 in session.query(censusTables).all():
     
 #print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
 
-allCounties = getAllCounties()
+allCounties = countyCodesRandom()
 
 print(allCounties)
-
-"""    
-for key in allCounties: 
-    x +=1
-    new = Locations(locationID = x, countyCode = allCounties[key], stateCode = key, stadiumExists = 0)
+   
+for item in allCounties: 
+    x += 1
+    new = Locations(locationID = x, countyCode = item[0], stateCode = item[1], stadiumExists = 0)
     session.add(new)
 
 session.commit()
@@ -167,8 +166,7 @@ for row in session.query(Locations).all():
     
 session.commit()
 session.flush()
-"""
-    
+
 """
     print(year, meanIncome, medianIncome, povertyPop) 
     print(year, medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge)

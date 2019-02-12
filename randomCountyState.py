@@ -1,41 +1,46 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 11 12:04:38 2019
+Created on Mon Feb 11 17:38:39 2019
 
-@author: canjurag4010
+@author: gmastorg
 """
 import requests
 import json
 import random 
+from sqlalchemy import create_engine
+from sqlalchemy import select
+from sqlalchemy import MetaData, Table
+import os
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean
+from sqlalchemy import Index
+from sqlalchemy.orm import relationship, backref
+import logging
+from sqlalchemy.orm import sessionmaker
 
 def countyCodesRandom():
-    countyStateDict = {}
-    counties = []
-    states = []
-    i = 1
+    allStatesandCounties = []
+    state_county = ()
+    selectedLocations = []
+    
+    i = 0
     
     url = requests.get("https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:*&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
     responseJson = list(json.loads(url.text))
-    print (responseJson)
-
-    while i<=56:
-        if i == 3 or i == 7 or i == 14 or i == 43 or i == 52:
-            i += 1
-        states.append(i)
-        i +=1    
-
-    for state in states:
-        x = random.randint(1,300)
-        
-        counties.append(x)  
     
-    countyStateDict = dict(zip(states,counties))
+    for item in responseJson:
+        state_county = item[2],item[3]
+        allStatesandCounties.append(state_county)
     
-    for key in countyStateDict:
-        for item in responseJson:
-            while key == item[2] and countyStateDict[key] != item[3]:
-                countyStateDict[key] = random.randint(1,300)
+    allStatesandCounties.pop(0)
     
-    print (countyStateDict)
-
+    print(allStatesandCounties)
+    
+    while i < 50:
+       x = random.randint(1,len(responseJson))
+       selectedLocations.append(allStatesandCounties[x])
+       i +=1
+    
+    print (selectedLocations) 
+       
 countyCodesRandom()
