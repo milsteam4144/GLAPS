@@ -140,7 +140,7 @@ for row1 in session.query(censusTables).all():
 
 allCounties = countyCodesRandom()
 
-print(allCounties)
+#print(allCounties)
    
 for item in allCounties: 
     x += 1

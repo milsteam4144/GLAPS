@@ -1,6 +1,8 @@
 import requests
 import json
 import random 
+
+"""
 from sqlalchemy import create_engine
 from sqlalchemy import select
 from sqlalchemy import MetaData, Table
@@ -11,7 +13,7 @@ from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
 import logging
 from sqlalchemy.orm import sessionmaker
-"""
+
 def getCountyCode():
     
     stadiumCountyStateCodes = []
@@ -64,7 +66,7 @@ def countyCodesRandom():
     
     allStatesandCounties.pop(0)
     
-    print(allStatesandCounties)
+    #print(allStatesandCounties)
     
     while i < 100:
        x = random.randint(1,len(responseJson))
@@ -81,16 +83,12 @@ def getCensusData(year, county, state, census_table):
         responseJson = list(json.loads(url.text))
         if year == 2017:
             return responseJson [1][0], responseJson[1][1], responseJson[1][2], responseJson[1][3]
-        elif year < 2017:
-            return responseJson [1][0], responseJson[1][1], responseJson[1][2], responseJson[1][4]
         else:
-            return 0
+            return responseJson [1][0], responseJson[1][1], responseJson[1][2], responseJson[1][4]
     if census_table.startswith('D'):
         url = requests.get("https://api.census.gov/data/" + str(year) + "/acs/acs5/profile?get="+census_table+",NAME&for=county:"+str(county)+"&in=state:"+str(state)+"&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
         responseJson = list(json.loads(url.text))
         return responseJson [1][0], responseJson[1][2], responseJson[1][2],responseJson[1][3], responseJson [1][4]
-    else:
-            return 0
     if census_table.startswith('B'):
         url = requests.get("https://api.census.gov/data/"+str(year)+"/acs/acs1/?get="+census_table+",NAME&for=county:"+str(county)+"&in=state:"+str(state)+"&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
         responseJson = list(json.loads(url.text))
