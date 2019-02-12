@@ -164,8 +164,8 @@ for row in session.query(Locations).all():
         new = Detailed_T(year, row.locationID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
         session.add(new)
     
-session.commit()
-session.flush()
+    session.commit()
+    session.flush()
 
 """
     print(year, meanIncome, medianIncome, povertyPop) 
