@@ -123,7 +123,20 @@ class Locations(Base):
         self.countyCode = countyCode
         self.stateCode = stateCode
         self.stadiumExists = stadiumExists
-       
+
+class StatesAndCounties_T(Base):
+    
+    __tablename__ = "States_Counties"
+    stateAndCounty = Column('StateAndCounty', String)
+    stateCode = Column('StateCode', String)
+    countyCode = Column('CountyCode', String)
+
+    def __init__(self, stateAndCounty, stateCode, countyCode):
+        
+        self.stateAndCounty = stateAndCounty
+        self.stateCode = stateCode
+        self.countyCode = countyCode
+        
 # Create the tables
 Base.metadata.create_all(engine)
 
@@ -137,6 +150,16 @@ for row1 in session.query(censusTables).all():
     censusList.append(row1.TableNames)
     
 #print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
+
+allStatesAndCounties = codesAndNames()
+
+for item in allCounties: 
+    x += 1
+    new = StatesAndCounties(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
+    session.add(new)
+
+session.commit()
+session.flush()    
 
 allCounties = countyCodesRandom()
 
