@@ -35,6 +35,9 @@ test = df.drop(train.index)
 #removes final column which is the one that will be predicted 
 test = test.drop(['medianHomeVal'], axis = 1)
 
+print(train)
+print (test)
+
 print(train.head())
 print(train.describe(include=[np.number]))
 print(train.corr())

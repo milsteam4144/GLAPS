@@ -164,7 +164,7 @@ session.flush()
 allCounties = countyCodesRandom()
 
 #print(allCounties)
-   
+x = 0  
 for item in allCounties: 
     x += 1
     new = Locations(locationID = x, countyCode = item[1], stateCode = item[0], stadiumExists = 0)
