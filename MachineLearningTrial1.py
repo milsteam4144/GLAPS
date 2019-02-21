@@ -30,14 +30,11 @@ df = df.drop(['locationID'], axis = 1)
 
 #randomly takes half of the DB dataset and places it in train
 train = df.sample(frac = 0.5, random_state=700)
+train_target = train['medianHomeVal']
 #places remaining items in test db
 test = df.drop(train.index)
-#removes final column which is the one that will be predicted 
-test = test.drop(['medianHomeVal'], axis = 1)
 
-print(train)
-print (test)
-
+print(train_target)
 print(train.head())
 print(train.describe(include=[np.number]))
 print(train.corr())
@@ -66,6 +63,7 @@ def generate_input_fn(filename, batch_size=BATCH_SIZE):
 
         return features
     return _input_fn
+    
 print('input function configured')
 
 from tensorflow.contrib import layers
