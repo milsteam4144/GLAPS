@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Feb 11 13:44:15 2019
+
+@author: canjurag4010
+"""
+
 import json
 from urllib.request import urlopen
 from sqlalchemy import create_engine
@@ -10,8 +17,7 @@ from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
 import logging
 from sqlalchemy.orm import sessionmaker
-from apis import getCountyCode, getCensusData
-from table_classes import eduPoverty_row
+from apis import countyCodesRandom, getCensusData
 
 
 path = os.path.abspath("MinorLeague.db")
@@ -28,87 +34,163 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-#Upload the ZipCodes table as a Table object
-zipCodes = Table('ZipCodes', metadata, autoload = True, autoload_with=engine)
+#Upload the Stadiums table as a Table object
+stadiums = Table('Stadiums', metadata, autoload = True, autoload_with=engine)
 censusTables = Table('CensusTables',metadata, autoload = True, autoload_with=engine)
-#print(zipCodes.columns)
+#print(stadiums.columns)
 
-# A table that gives the population of a stadium's county
-class Attributes(Base):
+#The following are three tables with various attributes (columns)
+
+class Subject_T(Base):
     
-    __tablename__ = "Attributes"
-    year = Column('year', Integer, primary_key = True)
-    stadium = Column('stadium', String(40), primary_key = True)
-    population = Column('population', Integer)
+    __tablename__ = "Subject"
+    year = Column('year', Integer, primary_key = True, nullable=False)
+    locationID = Column(Integer, primary_key = True, nullable=False)
     meanIncome = Column('meanIncome', Integer)
     medianIncome = Column('medianIncome', Integer)
     povertyPop = Column('povertyPop', Integer)
-    medianHomeVal= Column('medianHomeVal', Integer)
+    medianAge = Column('medianAge', Integer)
+    
+    def __init__(self, year, locationID, meanIncome,medianIncome,povertyPop,medianAge):
+        
+        self.year = year
+        self.locationID = locationID
+        self.meanIncome = meanIncome
+        self.medianIncome = medianIncome
+        self.povertyPop = povertyPop
+        self.medianAge = medianAge
+        
+        
+class Data_Profile_T(Base):
+    
+    __tablename__ = "Data_Profile"
+    year = Column('year', Integer, primary_key = True, nullable=False)
+    locationID = Column(Integer, primary_key = True, nullable=False)
     workers = Column('workers', Integer)
     medianHouseIncome = Column('medianHouseIncome', Integer)
     medianFamilyIncome = Column('medianFamilyIncome', Integer)
     medianNonFamIncome = Column('medianNonFamIncome', Integer)
     medianWorkerIncome = Column('medianWorkerIncome', Integer)
-    medianAge = Column('medianAge', Integer)
-    medianRealEstateTax = Column('medianRealEstateTax', Integer)
-    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
-    totalHouses = Column('totalHouses', Integer)
     
-    def __init__(self, year, stadium,meanIncome,medianIncome,povertyPop,medianHomeVal,
-                 workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,
-                 medianAge,population,medianRealEstateTax,medianHouseholdCosts,totalHouses):
+    
+    def __init__(self, year, locationID, \
+                 workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome):
         
         self.year = year
-        self.stadium = stadium
-        self.meanIncome = meanIncome
-        self.medianIncome = medianIncome
-        self.povertyPop = povertyPop
-        self.medianHomeVal = medianHomeVal
+        self.locationID = locationID
         self.workers = workers
         self.medianHouseIncome = medianHouseIncome
         self.medianFamilyIncome = medianFamilyIncome
         self.medianNonFamIncome = medianNonFamIncome
         self.medianWorkerIncome = medianWorkerIncome
-        self.medianAge = medianAge
+        
+class Detailed_T(Base):
+    
+    __tablename__ = "Detailed"
+    year = Column('year', Integer, primary_key = True, nullable=False)
+    locationID = Column(Integer, primary_key = True, nullable=False)
+    population = Column('population', Integer)
+    medianRealEstateTax = Column('medianRealEstateTax', Integer)
+    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
+    totalHouses = Column('totalHouses', Integer)
+    medianHomeVal= Column('medianHomeVal', Integer)
+
+    
+    
+    def __init__(self, year, locationID, population\
+                 ,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal):
+        
+        self.year = year
+        self.locationID = locationID
         self.population = population
         self.medianRealEstateTax = medianRealEstateTax
         self.medianHouseholdCosts = medianHouseholdCosts
         self.totalHouses = totalHouses
-
-# Create the table
-#Base.metadata.create_all(engine)
+        self.medianHomeVal = medianHomeVal
+        
+class Locations(Base):
     
-"""  
-jimmystadium = session.query(zipCodes).filter_by(ZipCode = 48317).one() #This returns the item from the table as an object
-print(jimmystadium.City) #Then you can access it's attributes directly
-"""
-       
+    __tablename__ = "Locations"
+    __table_args__ = {'sqlite_autoincrement':True}
+    locationID = Column(Integer, primary_key = True)
+    countyCode = Column('CountyCode', String)
+    stateCode = Column('StateCode', String)
+    stadiumExists = Column('StadiumExists', Integer)
+    
+    def __init__(self, locationID, countyCode, stateCode, stadiumExists):
+        
+        self.locationID = locationID
+        self.countyCode = countyCode
+        self.stateCode = stateCode
+        self.stadiumExists = stadiumExists
 
+class StatesAndCounties_T(Base):
+    
+    __tablename__ = "States_Counties"
+    stateAndCounty = Column('StateAndCounty', String)
+    stateCode = Column('StateCode', String)
+    countyCode = Column('CountyCode', String)
+
+    def __init__(self, stateAndCounty, stateCode, countyCode):
+        
+        self.stateAndCounty = stateAndCounty
+        self.stateCode = stateCode
+        self.countyCode = countyCode
+        
+# Create the tables
+Base.metadata.create_all(engine)
+
+       
 # A list of years that we need data for
 years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
 
-atList = []
-atList1 = []
-atList2 = []
-
 censusList = []
-
+x = 0
 for row1 in session.query(censusTables).all():
     censusList.append(row1.TableNames)
     
 #print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
 
+allStatesAndCounties = codesAndNames()
 
-for row in session.query(zipCodes).all():
+for item in allCounties: 
+    x += 1
+    new = StatesAndCounties(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
+    session.add(new)
+
+session.commit()
+session.flush()    
+
+allCounties = countyCodesRandom()
+
+#print(allCounties)
+x = 0  
+for item in allCounties: 
+    x += 1
+    new = Locations(locationID = x, countyCode = item[1], stateCode = item[0], stadiumExists = 0)
+    session.add(new)
+
+session.commit()
+session.flush()
+
+for row in session.query(Locations).all():
     for year in years:
-        meanIncome, medianIncome, povertyPop = getCensusData(year, row.County, row.State, censusList[0])
-        #subject table
-        medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge = getCensusData(year, row.County, row.State, censusList[1])
-        #data_profile table
-        population,medianRealEstateTax,medianHouseholdCosts,totalHouses = getCensusData(year, row.County, row.State, censusList[2])
-        #detailed_tables
+        meanIncome, medianIncome, povertyPop, medianAge = getCensusData(year, row.countyCode, row.stateCode, censusList[0])
+        new = Subject_T(year, row.locationID,  meanIncome, medianIncome, povertyPop, medianAge)
+        session.add(new)
+    
+        workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getCensusData(year, row.countyCode, row.stateCode, censusList[1])
+        new = Data_Profile_T(year, row.locationID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
+        session.add(new)
+        
+        population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getCensusData(year, row.countyCode, row.stateCode, censusList[2])
+        new = Detailed_T(year, row.locationID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+        session.add(new)
+    
+    session.commit()
+    session.flush()
 
-    """
+"""
     print(year, meanIncome, medianIncome, povertyPop) 
     print(year, medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge)
     print(year, population,medianRealEstateTax,medianHouseholdCosts,totalHouses )       
