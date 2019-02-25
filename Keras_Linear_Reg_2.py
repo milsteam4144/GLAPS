@@ -26,12 +26,12 @@ engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid 
 #Link a session to the engine and initialize it
 conn = engine.connect()
 
-df = pd.read_sql_table('Detailed', conn)
-df = df.drop(['locationID'], axis = 1)
-df = df.drop(['year'], axis = 1)
+df = pd.read_sql_table('Detailed_2011', conn)
+df = df.drop(['CountyCode'], axis = 1)
+df['StateCode'] = pd.to_numeric(df['StateCode'],errors='coerce').fillna(0)
 
-#randomly takes 80% of the DB dataset and places it in train
-train = df.sample(frac = 0.7, random_state=700)
+#randomly takes 70% of the DB dataset and places it in train
+train = df.sample(frac = 0.7, random_state=800)
 
 #places remaining items in test db
 test = df.drop(train.index)
@@ -69,7 +69,7 @@ model.add(Dense(1,input_dim=5, kernel_initializer='normal',activation='relu'))
 model.compile(loss='mse', optimizer='adam')
 """
 #uses functional API model
-inputs = Input(shape=(4,))
+inputs = Input(shape=(5,))
 preds = Dense(1,activation='linear')(inputs)
 
 model_2 = Model(inputs=inputs,outputs=preds)
@@ -81,10 +81,10 @@ Train Model
 """
 
 #Train the model
-hist = model_2.fit(train_data,train_targets,batch_size=15, epochs = 490)
+hist = model_2.fit(train_data,train_targets,batch_size=25, epochs = 560)
 
 #visualizing losses and accuracy
-num_epochs = 490
+num_epochs = 560
 train_losses=hist.history['loss']
 xc=range(num_epochs)
 
