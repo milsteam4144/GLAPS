@@ -160,13 +160,82 @@ class Detailed_2011_T(Base):
         self.medianHouseholdCosts = medianHouseholdCosts
         self.totalHouses = totalHouses
         self.medianHomeVal = medianHomeVal
+
+class Detailed_2014_T(Base):
+    
+    __tablename__ = "Detailed_2014"
+    stateCode = Column('StateCode', String, primary_key=True)
+    countyCode = Column('CountyCode', String, primary_key = True)
+    population = Column('population', Integer)
+    medianRealEstateTax = Column('medianRealEstateTax', Integer)
+    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
+    totalHouses = Column('totalHouses', Integer)
+    medianHomeVal= Column('medianHomeVal', Integer)
+
+    def __init__(self, stateCode,countyCode, population\
+                 ,medianRealEstateTax,medianHouseholdCosts\
+                 ,totalHouses,medianHomeVal):
+        
+        self.stateCode = stateCode
+        self.countyCode = countyCode
+        self.population = population
+        self.medianRealEstateTax = medianRealEstateTax
+        self.medianHouseholdCosts = medianHouseholdCosts
+        self.totalHouses = totalHouses
+        self.medianHomeVal = medianHomeVal
+
+class Detailed_2012_T(Base):
+    
+    __tablename__ = "Detailed_2012"
+    stateCode = Column('StateCode', String, primary_key=True)
+    countyCode = Column('CountyCode', String, primary_key = True)
+    population = Column('population', Integer)
+    medianRealEstateTax = Column('medianRealEstateTax', Integer)
+    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
+    totalHouses = Column('totalHouses', Integer)
+    medianHomeVal= Column('medianHomeVal', Integer)
+
+    def __init__(self, stateCode,countyCode, population\
+                 ,medianRealEstateTax,medianHouseholdCosts\
+                 ,totalHouses,medianHomeVal):
+        
+        self.stateCode = stateCode
+        self.countyCode = countyCode
+        self.population = population
+        self.medianRealEstateTax = medianRealEstateTax
+        self.medianHouseholdCosts = medianHouseholdCosts
+        self.totalHouses = totalHouses
+        self.medianHomeVal = medianHomeVal
+
+class Detailed_2013_T(Base):
+    
+    __tablename__ = "Detailed_2013"
+    stateCode = Column('StateCode', String, primary_key=True)
+    countyCode = Column('CountyCode', String, primary_key = True)
+    population = Column('population', Integer)
+    medianRealEstateTax = Column('medianRealEstateTax', Integer)
+    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
+    totalHouses = Column('totalHouses', Integer)
+    medianHomeVal= Column('medianHomeVal', Integer)
+
+    def __init__(self, stateCode,countyCode, population\
+                 ,medianRealEstateTax,medianHouseholdCosts\
+                 ,totalHouses,medianHomeVal):
+        
+        self.stateCode = stateCode
+        self.countyCode = countyCode
+        self.population = population
+        self.medianRealEstateTax = medianRealEstateTax
+        self.medianHouseholdCosts = medianHouseholdCosts
+        self.totalHouses = totalHouses
+        self.medianHomeVal = medianHomeVal
         
 # Create the tables
 Base.metadata.create_all(engine)
 
        
 # A list of years that we need data for
-years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
+years = [2011, 2012, 2013, 2014]
 
 censusList = []
 x = 0
@@ -176,31 +245,52 @@ for row1 in session.query(censusTables).all():
 #print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
 
 allStatesAndCounties = codesAndNames()
-AllDetailedCounties = getAllDetailedTCensusData(2011, censusList[2])
-"""
+
+for year in years:
+    AllDetailedCounties = getAllDetailedTCensusData(year, censusList[2])
+    
+    for item in AllDetailedCounties: 
+        population = item[0] 
+        medianRealEstateTax = item[1]
+        medianHouseholdCosts = item[2]
+        totalHouses = item[3]
+        medianHomeVal = item[4]
+        stateCode = item[5]
+        countyCode = item[6]
+        
+        if year == 2011:
+            new = Detailed_2011_T(stateCode, countyCode, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+    
+            session.add(new)
+        
+        if year == 2012:
+            new = Detailed_2012_T(stateCode, countyCode, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+    
+            session.add(new)
+        
+        if year == 2013:
+            new = Detailed_2013_T(stateCode, countyCode, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+    
+            session.add(new)
+        
+        if year == 2014:
+            new = Detailed_2014_T(stateCode, countyCode, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+    
+            session.add(new)
+            
+   
+    session.commit()
+    session.flush() 
+    
+
 for item in allStatesAndCounties:
     new = StatesAndCounties_T(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
     session.add(new)
 
 session.commit()
 session.flush() 
-"""
-for item in AllDetailedCounties: 
-    population = item[0] 
-    medianRealEstateTax = item[1]
-    medianHouseholdCosts = item[2]
-    totalHouses = item[3]
-    medianHomeVal = item[4]
-    stateCode = item[5]
-    countyCode = item[6]
- 
-    new = Detailed_2011_T(stateCode, countyCode, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
-    
-    session.add(new)
-   
-    session.commit()
-    session.flush() 
-       
+
+"""      
 #allCounties = countyCodesRandom()
 
 #print(allCounties)
@@ -244,3 +334,4 @@ for row in session.query(Locations).all():
         #session.commit() IT KEPT THROWING AN ERROR THAT DATABASE IS LOCKED
 
     #for row in session.query(zipCodes).filter_by(ZipCode= '48317').first():
+    """
