@@ -17,7 +17,7 @@ from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
 import logging
 from sqlalchemy.orm import sessionmaker
-from apis import countyCodesRandom, getCensusData
+from apis import codesAndNames, countyCodesRandom, getCensusData
 
 
 path = os.path.abspath("MinorLeague.db")
@@ -128,7 +128,7 @@ class Locations(Base):
 class StatesAndCounties_T(Base):
     
     __tablename__ = "States_Counties"
-    stateAndCounty = Column('StateAndCounty', String)
+    stateAndCounty = Column('StateAndCounty', String, primary_key=True)
     stateCode = Column('StateCode', String)
     countyCode = Column('CountyCode', String)
 
@@ -138,10 +138,10 @@ class StatesAndCounties_T(Base):
         self.stateCode = stateCode
         self.countyCode = countyCode
 
-class Detatiled_2011_T(Base):
+class Detailed_2011_T(Base):
     
     __tablename__ = "Detailed_2011"
-    stateCode = Column('StateCode', String)
+    stateCode = Column('StateCode', String, primary_key=True)
     countyCode = Column('CountyCode', String)
     population = Column('population', Integer)
     medianRealEstateTax = Column('medianRealEstateTax', Integer)
@@ -179,11 +179,11 @@ allStatesAndCounties = codesAndNames()
 
 for item in allStatesAndCounties:
     x += 1
-    new = StatesAndCounties(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
+    new = StatesAndCounties_T(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
     session.add(new)
     
     population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getCensusData(2011, item[1], item[2], censusList[2])
-    new = Detailed_T(item[1], item[2], population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+    new = Detailed_2011_T(item[1], item[2], population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
     session.add(new)   
 
 session.commit()

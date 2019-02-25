@@ -40,7 +40,7 @@ def codesAndNames():
     
     allStatesandCounties.pop(0)
     
-    return allStateandCounties
+    return allStatesandCounties
 
 def getCensusData(year, county, state, census_table):    
 
