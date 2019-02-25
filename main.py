@@ -15,10 +15,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean
 from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
-import logging
 from sqlalchemy.orm import sessionmaker
-from apis import countyCodesRandom, getCensusData
-
+from apis import countyCodesRandom, getCensusData, codesAndNames
 
 path = os.path.abspath("MinorLeague.db")
 #dir_path = os.path.dirname(os.path.realpath("/MinorLeague/MinorLeague.db"))
@@ -50,8 +48,10 @@ class Subject_T(Base):
     medianIncome = Column('medianIncome', Integer)
     povertyPop = Column('povertyPop', Integer)
     medianAge = Column('medianAge', Integer)
+    stateCode = Column('stateCode', Integer)
+    countyCode = Column('countyCode', Integer)
     
-    def __init__(self, year, locationID, meanIncome,medianIncome,povertyPop,medianAge):
+    def __init__(self, year, locationID, meanIncome,medianIncome,povertyPop,medianAge, stateCode, countyCode):
         
         self.year = year
         self.locationID = locationID
@@ -59,6 +59,8 @@ class Subject_T(Base):
         self.medianIncome = medianIncome
         self.povertyPop = povertyPop
         self.medianAge = medianAge
+        self.stateCode = stateCode
+        self.countyCode = countyCode
         
         
 class Data_Profile_T(Base):
@@ -71,10 +73,12 @@ class Data_Profile_T(Base):
     medianFamilyIncome = Column('medianFamilyIncome', Integer)
     medianNonFamIncome = Column('medianNonFamIncome', Integer)
     medianWorkerIncome = Column('medianWorkerIncome', Integer)
+    stateCode = Column('stateCode', Integer)
+    countyCode = Column('countyCode', Integer)
     
     
     def __init__(self, year, locationID, \
-                 workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome):
+                 workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome, stateCode, countyCode):
         
         self.year = year
         self.locationID = locationID
@@ -83,6 +87,8 @@ class Data_Profile_T(Base):
         self.medianFamilyIncome = medianFamilyIncome
         self.medianNonFamIncome = medianNonFamIncome
         self.medianWorkerIncome = medianWorkerIncome
+        self.stateCode = stateCode
+        self.countyCode = countyCode
         
 class Detailed_T(Base):
     
@@ -94,11 +100,13 @@ class Detailed_T(Base):
     medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
     totalHouses = Column('totalHouses', Integer)
     medianHomeVal= Column('medianHomeVal', Integer)
+    stateCode = Column('stateCode', Integer)
+    countyCode = Column('countyCode', Integer)
 
     
     
     def __init__(self, year, locationID, population\
-                 ,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal):
+                 ,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal, stateCode, countyCode):
         
         self.year = year
         self.locationID = locationID
@@ -107,6 +115,8 @@ class Detailed_T(Base):
         self.medianHouseholdCosts = medianHouseholdCosts
         self.totalHouses = totalHouses
         self.medianHomeVal = medianHomeVal
+        self.stateCode = stateCode
+        self.countyCode = countyCode
         
 class Locations(Base):
     
@@ -127,7 +137,7 @@ class Locations(Base):
 class StatesAndCounties_T(Base):
     
     __tablename__ = "States_Counties"
-    stateAndCounty = Column('StateAndCounty', String)
+    stateAndCounty = Column('StateAndCounty', String, primary_key = True)
     stateCode = Column('StateCode', String)
     countyCode = Column('CountyCode', String)
 
@@ -153,9 +163,9 @@ for row1 in session.query(censusTables).all():
 
 allStatesAndCounties = codesAndNames()
 
-for item in allCounties: 
+for item in allStatesAndCounties: 
     x += 1
-    new = StatesAndCounties(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
+    new = StatesAndCounties_T(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
     session.add(new)
 
 session.commit()
@@ -175,17 +185,30 @@ session.flush()
 
 for row in session.query(Locations).all():
     for year in years:
-        meanIncome, medianIncome, povertyPop, medianAge = getCensusData(year, row.countyCode, row.stateCode, censusList[0])
-        new = Subject_T(year, row.locationID,  meanIncome, medianIncome, povertyPop, medianAge)
-        session.add(new)
-    
-        workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getCensusData(year, row.countyCode, row.stateCode, censusList[1])
-        new = Data_Profile_T(year, row.locationID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
-        session.add(new)
         
+        #Populate the Subject Table
+        meanIncome, medianIncome, povertyPop, medianAge = getCensusData(year, row.countyCode, row.stateCode, censusList[0])
+        if meanIncome  and medianIncome and povertyPop and medianAge and row.countyCode and row.stateCode and year and row.locationID:
+            new = Subject_T(year, row.locationID,  meanIncome, medianIncome, povertyPop, medianAge, row.stateCode, row.countyCode)
+            session.add(new)
+        else:
+            print("Error occured in Subject Table -S")
+        
+        #Populate the Data_Profile Table
+        workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome = getCensusData(year, row.countyCode, row.stateCode, censusList[1])
+        if workers and medianHouseIncome and medianFamilyIncome and medianNonFamIncome and medianWorkerIncome and row.countyCode and row.stateCode and year and row.locationID:
+            new = Data_Profile_T(year, row.locationID, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome, row.stateCode, row.countyCode)
+            session.add(new)
+        else:
+            print("Error occured in Data_Profile Table -D")
+        
+        #Populate the detailed Table.
         population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getCensusData(year, row.countyCode, row.stateCode, censusList[2])
-        new = Detailed_T(year, row.locationID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
-        session.add(new)
+        if population and medianRealEstateTax and medianHouseholdCosts and totalHouses and medianHomeVal and row.countyCode and row.stateCode and year and row.locationID:
+            new = Detailed_T(year, row.locationID, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal, row.stateCode, row.countyCode)
+            session.add(new)
+        else:
+            print("Error occured in Data_Profile Table -B")
     
     session.commit()
     session.flush()

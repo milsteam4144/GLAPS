@@ -8,7 +8,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean
 from sqlalchemy import Index
 from sqlalchemy.orm import relationship, backref
-import logging
 from sqlalchemy.orm import sessionmaker
 from apis import countyCodesRandom, getCensusData
 import numpy as np

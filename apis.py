@@ -55,25 +55,30 @@ def countyCodesRandom():
     state_county = ()
     selectedLocations = []
     
-    i = 1
+    #i = 1
     
     url = requests.get("https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:*&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
     responseJson = list(json.loads(url.text))
     
     for item in responseJson:
+        #item[2] is state item[3] is county
         state_county = item[2],item[3]
-        allStatesandCounties.append(state_county)
+        if item[2] != '72':
+            allStatesandCounties.append(state_county)
     
     allStatesandCounties.pop(0)
     
     #print(allStatesandCounties)
-    
+    """
     while i < 101:
-       x = random.randint(1,len(responseJson))
+       x = random.randint(1,len(allStatesandCounties))
        selectedLocations.append(allStatesandCounties[x])
        i +=1
+       """
+    #selectedLocations.append(allStatesandCounties)
     
-    return selectedLocations 
+    return allStatesandCounties[1:50]
+    #return selectedLocations 
 
 def codesAndNames():
     allStatesandCounties = []
@@ -84,15 +89,17 @@ def codesAndNames():
     
     for item in responseJson:
         state_county = item[0],item[3],item[2]
-        allStatesandCounties.append(state_county)
+        if item[2] != '72':
+            allStatesandCounties.append(state_county)
     
     allStatesandCounties.pop(0)
     
-    return allStateandCounties
+    return allStatesandCounties
 
 def getCensusData(year, county, state, census_table):    
 
-    url = ''    
+    url = ''
+    #The Subject Table
     if census_table.startswith('S'):
         url = requests.get("https://api.census.gov/data/"+str(year)+"/acs/acs1/subject?get="+census_table+",NAME&for=county:"+str(county)+"&in=state:"+str(state)+"&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
         responseJson = list(json.loads(url.text))
@@ -100,10 +107,12 @@ def getCensusData(year, county, state, census_table):
             return responseJson [1][0], responseJson[1][1], responseJson[1][2], responseJson[1][3]
         else:
             return responseJson [1][0], responseJson[1][1], responseJson[1][2], responseJson[1][4]
+    #Data_Profile Table
     if census_table.startswith('D'):
         url = requests.get("https://api.census.gov/data/" + str(year) + "/acs/acs5/profile?get="+census_table+",NAME&for=county:"+str(county)+"&in=state:"+str(state)+"&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
         responseJson = list(json.loads(url.text))
         return responseJson [1][0], responseJson[1][2], responseJson[1][2],responseJson[1][3], responseJson [1][4]
+    #The Detailed Table
     if census_table.startswith('B'):
         url = requests.get("https://api.census.gov/data/"+str(year)+"/acs/acs1/?get="+census_table+",NAME&for=county:"+str(county)+"&in=state:"+str(state)+"&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
         responseJson = list(json.loads(url.text))
