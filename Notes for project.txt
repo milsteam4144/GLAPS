@@ -92,6 +92,7 @@ If table starts with B (no word after acs1/)
 
 Couldn’t find crime rates or school ratings in census but I think this is enough to start with
 
+add pytests for when it selects the random locations
 
 ToDo:
 find one year versions of census tables for median household values and household incomes for zipcodes
