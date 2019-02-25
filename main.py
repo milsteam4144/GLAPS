@@ -41,6 +41,7 @@ censusTables = Table('CensusTables',metadata, autoload = True, autoload_with=eng
 
 #The following are three tables with various attributes (columns)
 
+"""
 class Subject_T(Base):
     
     __tablename__ = "Subject"
@@ -123,7 +124,7 @@ class Locations(Base):
         self.countyCode = countyCode
         self.stateCode = stateCode
         self.stadiumExists = stadiumExists
-
+"""
 class StatesAndCounties_T(Base):
     
     __tablename__ = "States_Counties"
@@ -136,6 +137,29 @@ class StatesAndCounties_T(Base):
         self.stateAndCounty = stateAndCounty
         self.stateCode = stateCode
         self.countyCode = countyCode
+
+class Detatiled_2011_T(Base):
+    
+    __tablename__ = "Detailed_2011"
+    stateCode = Column('StateCode', String)
+    countyCode = Column('CountyCode', String)
+    population = Column('population', Integer)
+    medianRealEstateTax = Column('medianRealEstateTax', Integer)
+    medianHouseholdCosts = Column('medianHouseholdCosts', Integer)
+    totalHouses = Column('totalHouses', Integer)
+    medianHomeVal= Column('medianHomeVal', Integer)
+
+    def __init__(self, stateCode, countyCode, population\
+                 ,medianRealEstateTax,medianHouseholdCosts\
+                 ,totalHouses,medianHomeVal):
+        
+        self.stateCode = stateCode
+        self.countyCode = countyCode
+        self.population = population
+        self.medianRealEstateTax = medianRealEstateTax
+        self.medianHouseholdCosts = medianHouseholdCosts
+        self.totalHouses = totalHouses
+        self.medianHomeVal = medianHomeVal
         
 # Create the tables
 Base.metadata.create_all(engine)
@@ -153,17 +177,22 @@ for row1 in session.query(censusTables).all():
 
 allStatesAndCounties = codesAndNames()
 
-for item in allCounties: 
+for item in allStatesAndCounties:
     x += 1
     new = StatesAndCounties(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
     session.add(new)
+    
+    population,medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal = getCensusData(2011, item[1], item[2], censusList[2])
+    new = Detailed_T(item[1], item[2], population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+    session.add(new)   
 
 session.commit()
 session.flush()    
 
-allCounties = countyCodesRandom()
+#allCounties = countyCodesRandom()
 
 #print(allCounties)
+"""
 x = 0  
 for item in allCounties: 
     x += 1
@@ -190,7 +219,7 @@ for row in session.query(Locations).all():
     session.commit()
     session.flush()
 
-"""
+
     print(year, meanIncome, medianIncome, povertyPop) 
     print(year, medianHomeVal,workers,medianHouseIncome,medianFamilyIncome,medianNonFamIncome,medianWorkerIncome,medianAge)
     print(year, population,medianRealEstateTax,medianHouseholdCosts,totalHouses )       

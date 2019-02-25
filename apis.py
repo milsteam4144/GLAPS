@@ -2,54 +2,6 @@ import requests
 import json
 import random 
 
-"""
-from sqlalchemy import create_engine
-from sqlalchemy import select
-from sqlalchemy import MetaData, Table
-import os
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, ForeignKey, Integer, String, Float, Boolean
-from sqlalchemy import Index
-from sqlalchemy.orm import relationship, backref
-import logging
-from sqlalchemy.orm import sessionmaker
-
-def getCountyCode():
-    
-    stadiumCountyStateCodes = []
-    state_county=[]
-    path = os.path.abspath("MinorLeague.db")
-    #dir_path = os.path.dirname(os.path.realpath("/MinorLeague/MinorLeague.db"))
-    #Define declarative base class
-    Base = declarative_base()
-    engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid of log
-    #Link a session to the engine and initialize it
-    conn = engine.connect()
-    metadata = Base.metadata
-
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
-
-
-    #Upload the stadiums table as a Table object
-    stadiums = Table('Stadiums', metadata, autoload = True, autoload_with=engine)
-
-
-    url = requests.get("https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:*&key=02a32d03b6dff733b0973d974df5e01c2de1daf3")
-    #response = url.read().decode('utf-8')
-    responseJson = list(json.loads(url.text))
-    
-    for row in session.query(stadiums).all():  
-        for item in list(responseJson):
-            if item[0] == str(row.County) + " County, " + str(row.State):
-                state_county.append(item[2])
-                state_county.append(item[3])
-                stadiumCountyStateCodes.append(state_county)
-    
-    return stadiumCountyStateCodes
-    print(stadiumCountyStateCodes)
-"""
 def countyCodesRandom():
     allStatesandCounties = []
     state_county = ()
