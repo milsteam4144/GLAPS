@@ -148,20 +148,32 @@ Base.metadata.create_all(engine)
 # A list of years that we need data for
 years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
 
+'''
+Gets string of table names needed for apis
+'''
+
 censusList = []
 for row1 in session.query(censusTables).all():
     censusList.append(row1.TableNames)
 
-#print(censusList[0]+"Next:"+ censusList[1]+"Next:"+ censusList[2])
-
+'''
+gets a list of names and codes for all counties and states
+'''
 allStatesAndCounties = codesAndNames()
 
+'''
+sends the info in list above to db
+'''
 for item in allStatesAndCounties:
     new = StatesAndCounties_T(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
     session.add(new)
 
 session.commit()
 session.flush()
+
+'''
+uses data above to create a table with location ID and eventually stadiums
+'''
 
 x = 0  
 for item in allStatesAndCounties: 
@@ -176,12 +188,18 @@ AllDetailedCounties = []
 AllSubjectCounties = []
 AllDataProfilesCounties = []
 
+'''
+creates list of lists with data for all years in all counties and states
+'''
 for year in years:
 
     AllDetailedCounties.append(getCensusData(year, censusList[2]))
     AllDataProfilesCounties.append(getCensusData(year, censusList[1]))
     AllSubjectCounties.append(getCensusData(year, censusList[0]))
-    
+
+'''
+puts data into detailed table in db
+'''
 for data in AllDetailedCounties:
     for item in data:
         year = item[0]
@@ -198,7 +216,10 @@ for data in AllDetailedCounties:
    
 session.commit()
 session.flush()
-   
+
+'''
+puts data into data profiles table in db
+'''   
 for data in AllDataProfilesCounties:
     for item in data:
         year = item[0]
@@ -215,6 +236,10 @@ for data in AllDataProfilesCounties:
    
 session.commit()
 session.flush()
+
+'''
+puts data into subject table in db
+'''
 
 for data in AllSubjectCounties:
     for item in data:

@@ -2,6 +2,9 @@ import requests
 import json
 import random 
 
+'''
+creates a list from the api of the County and State names as well as the codes
+'''
 def codesAndNames():
     allStatesandCounties = []
     state_county = ()
@@ -18,9 +21,14 @@ def codesAndNames():
     
     return allStatesandCounties
 
+'''
+creates a list from the api of the various pieces of information obtained from each table set
+'''
 def getCensusData(year, census_table):
 
+    #list
     TableData = []
+    #list of lists
     AllCountiesData = []
        
     if census_table.startswith('B'):
