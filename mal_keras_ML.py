@@ -36,7 +36,7 @@ df = pd.read_sql_table('Detailed', conn)
 df = df.drop(['locationID'], axis = 1)
 
 #randomly takes half of the DB dataset and places it in train
-train = df.sample(frac = 0.5, random_state=700)
+train = df.sample(frac = 0.7, random_state=700)
 train_targets = train['medianHomeVal']
 
 train_data = train.drop(['medianHomeVal'], axis = 1)
@@ -48,6 +48,7 @@ test = df.drop(train_data.index)
 test_targets = test['medianHomeVal']
 test_data = test.drop(['medianHomeVal'], axis = 1)
 
+
 #Normalize the data
 mean = train_data.mean(axis=0)
 train_data -= mean
@@ -58,6 +59,11 @@ test_data -= mean
 test_data /= std
 
 #print (test_data)
+
+train_data = np.array(train_data)
+train_targets = np.array(train_targets)
+test_data = np.array(test_data)
+test_targets = np.array(test_targets)
 
 def build_model():
     model = models.Sequential()

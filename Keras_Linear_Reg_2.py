@@ -13,7 +13,7 @@ from keras.layers import Dense, Activation
 #from keras.callbacks import TensorBoard
 
 """
-Print versions of tensorflow anr keras
+Print versions of tensorflow and keras
 """
 print('tensorflow_version:',tf.__version__)
 print('keras_version:',keras.__version__)
@@ -39,14 +39,16 @@ print (test)
 
 """
 normalize train data
-"""
+
 
 mean = train.mean()
 std = train.std()
 train = (train-mean)/std
 
-train.describe()
+#normalize to between 0 and 1 instead of this
 
+train.describe()
+"""
 """
 features
 """
@@ -56,6 +58,9 @@ train_data = train.drop(['medianHomeVal'], axis = 1)
 #makes data numpy arrays
 train_data=np.array(train_data)
 train_targets = np.array(train_targets)
+
+train_data = tf.keras.utils.normalize(train_data, axis = -1, order = 2)
+train_targets = tf.keras.utils.normalize(train_targets, axis = -1, order = 2)
 
 """
 Keras Model
@@ -69,7 +74,7 @@ model.add(Dense(1,input_dim=5, kernel_initializer='normal',activation='relu'))
 model.compile(loss='mse', optimizer='adam')
 """
 #uses functional API model
-inputs = Input(shape=(5,))
+inputs = Input(shape=(560,5))
 preds = Dense(1,activation='linear')(inputs)
 
 model_2 = Model(inputs=inputs,outputs=preds)
@@ -99,16 +104,20 @@ plt.style.use(['classic'])
 
 """
 normalize test data
-"""
+
 mean = test.mean()
 std = test.std()
 test = (test-mean)/std
-
+"""
 test_targets = test['medianHomeVal']
 test_data = test.drop(['medianHomeVal'], axis = 1)
 
 test_data = np.array(test_data)
 test_targets = np.array(test_targets)
+
+test_targets = tf.keras.utils.normalize(test_targets, axis = -1, order = 2)
+test_data = tf.keras.utils.normalize(test_data, axis = -1, order = 2)
+
 score = model_2.evaluate(test_data, test_targets)
 
 """
