@@ -38,7 +38,7 @@ def getCensusData(year, census_table):
         #print(responseJson)
 
         for item in responseJson:
-            TableData=[year,item[0],item[1],item[2],item[3],item[4],item[6],item[7]]
+            TableData=[year,item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7]]
             
             if item [6] != '72':
                 AllCountiesData.append(TableData)
@@ -53,9 +53,9 @@ def getCensusData(year, census_table):
 
         for item in responseJson:
             if year == 2017:
-                TableData=[year,item[0],item[1],item[2],item[3],item[6],item[7]]
+                TableData=[year,item[0],item[1],item[2],item[3],item[5],item[6],item[7]]
             else:
-                TableData=[year,item[0],item[1],item[2],item[4],item[6],item[7]]
+                TableData=[year,item[0],item[1],item[2],item[4],item[5],item[6],item[7]]
             
             if item [6] != '72':
                 AllCountiesData.append(TableData)
@@ -69,7 +69,7 @@ def getCensusData(year, census_table):
         responseJson = list(json.loads(url.text))
 
         for item in responseJson:
-            TableData=[year,item[0],item[1],item[2],item[3],item[4],item[6],item[7]]
+            TableData=[year,item[0],item[1],item[2],item[3],item[4],item[5],item[6],item[7]]
             
             if item [6] != '72':
                 AllCountiesData.append(TableData)

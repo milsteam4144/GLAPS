@@ -45,6 +45,7 @@ class Subject_T(Base):
     
     __tablename__ = "Subject"
     year = Column('year', Integer, primary_key = True, nullable=False)
+    stateCountyName = Column('StateCountyName', String) 
     stateCode = Column('StateCode', String, primary_key=True)
     countyCode = Column('CountyCode', String, primary_key = True)
     meanIncome = Column('meanIncome', Integer)
@@ -52,9 +53,10 @@ class Subject_T(Base):
     povertyPop = Column('povertyPop', Integer)
     medianAge = Column('medianAge', Integer)
     
-    def __init__(self, year, stateCode, countyCode, meanIncome,medianIncome,povertyPop,medianAge):
+    def __init__(self, year, stateCountyName, stateCode, countyCode, meanIncome,medianIncome,povertyPop,medianAge):
         
         self.year = year
+        self.stateCountyName = stateCountyName
         self.stateCode = stateCode
         self.countyCode = countyCode
         self.meanIncome = meanIncome
@@ -67,6 +69,7 @@ class Data_Profile_T(Base):
     
     __tablename__ = "Data_Profile"
     year = Column('year', Integer, primary_key = True, nullable=False)
+    stateCountyName = Column('StateCountyName', String) 
     stateCode = Column('StateCode', String, primary_key=True)
     countyCode = Column('CountyCode', String, primary_key = True)
     workers = Column('workers', Integer)
@@ -76,10 +79,11 @@ class Data_Profile_T(Base):
     medianWorkerIncome = Column('medianWorkerIncome', Integer)
     
     
-    def __init__(self, year, stateCode, countyCode,\
+    def __init__(self, year, stateCountyName, stateCode, countyCode,\
                  workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome):
         
         self.year = year
+        self.stateCountyName = stateCountyName
         self.stateCode = stateCode
         self.countyCode = countyCode
         self.workers = workers
@@ -92,6 +96,7 @@ class Detailed_T(Base):
     
         __tablename__ = 'Detailed'
         year = Column('Year', Integer, primary_key=True)
+        stateCountyName = Column('StateCountyName', String) 
         stateCode = Column('StateCode', String, primary_key=True)
         countyCode = Column('CountyCode', String, primary_key = True)
         population = Column('population', Integer)
@@ -100,11 +105,12 @@ class Detailed_T(Base):
         totalHouses = Column('totalHouses', Integer)
         medianHomeVal= Column('medianHomeVal', Integer)
 
-        def __init__(self, year, stateCode,countyCode, population\
+        def __init__(self, year, stateCountyName, stateCode,countyCode, population\
                  ,medianRealEstateTax,medianHouseholdCosts\
                  ,totalHouses,medianHomeVal):
 
             self.year = year
+            self.stateCountyName = stateCountyName
             self.stateCode = stateCode
             self.countyCode = countyCode
             self.population = population
@@ -207,11 +213,12 @@ for data in AllDetailedCounties:
         medianRealEstateTax = item[2]
         medianHouseholdCosts = item[3]
         totalHouses = item[4]
+        stateCountyName = item[6] 
         medianHomeVal = item[5]
-        stateCode = item[6]
-        countyCode = item[7]
+        stateCode = item[7]
+        countyCode = item[8]
 
-        new = Detailed_T(year, stateCode, countyCode, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
+        new = Detailed_T(year, stateCountyName, stateCode, countyCode, population, medianRealEstateTax,medianHouseholdCosts,totalHouses,medianHomeVal)
         session.add(new)
    
 session.commit()
@@ -227,11 +234,12 @@ for data in AllDataProfilesCounties:
         medianHouseIncome = item[2]
         medianFamilyIncome = item[3]
         medianNonFamIncome = item[4]
+        stateCountyName = item[6] 
         medianWorkerIncome = item[5]
-        stateCode = item[6]
-        countyCode = item[7]
+        stateCode = item[7]
+        countyCode = item[8]
 
-        new = Data_Profile_T(year, stateCode, countyCode, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
+        new = Data_Profile_T(year, stateCountyName, stateCode, countyCode, workers, medianHouseIncome, medianFamilyIncome, medianNonFamIncome, medianWorkerIncome)
         session.add(new)
    
 session.commit()
@@ -248,10 +256,11 @@ for data in AllSubjectCounties:
         medianIncome = item[2]
         povertyPop = item[3]
         medianAge = item[4]
-        stateCode = item[5]
-        countyCode = item[6]
+        stateCountyName = item[5] 
+        stateCode = item[6]
+        countyCode = item[7]
 
-        new = Subject_T(year, stateCode, countyCode, meanIncome, medianIncome, povertyPop, medianAge)
+        new = Subject_T(year, stateCountyName, stateCode, countyCode, meanIncome, medianIncome, povertyPop, medianAge)
         session.add(new)
    
 session.commit()

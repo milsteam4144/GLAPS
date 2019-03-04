@@ -26,14 +26,15 @@ engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid 
 #Link a session to the engine and initialize it
 conn = engine.connect()
 
-df = pd.read_sql_table('Detailed', conn)
+df = pd.read_sql_table('all_3_Data', conn)
 df = df[:800]
 df = df.drop(['CountyCode'], axis = 1)
 df = df.drop(['Year'], axis = 1)
+df = df.drop(['StateAndCounty'], axis = 1)
 df['StateCode'] = pd.to_numeric(df['StateCode'],errors='coerce').fillna(0)
 
 #randomly takes 50% of the DB dataset and places it in train
-train = df.sample(frac = 0.5, random_state=800)
+train = df.sample(frac = 0.6, random_state=800)
 
 #places remaining items in test db
 test = df.drop(train.index)
@@ -42,23 +43,20 @@ test = df.drop(train.index)
 normalize train data
 """
 
-train = tf.keras.utils.normalize(train, axis = -1, order = 2)
-
 """
 features
 """
 train_targets = train['medianHomeVal']
 train_data = train.drop(['medianHomeVal'], axis = 1)
+
+train_data = tf.keras.utils.normalize(train_data, axis = -1, order = 2)
    
 #makes data numpy arrays
 train_data=np.array(train_data)
 train_targets = np.array(train_targets)
 
 #normalizes data from 0 - 1
-
-
-print(len(train_data))
-print(len(train_targets))
+print (train_data)
 
 """
 Keras Model
@@ -72,9 +70,9 @@ model.add(Dense(1,input_dim=5, kernel_initializer='normal',activation='relu'))
 model.compile(loss='mse', optimizer='adam')
 """
 #uses functional API model
-inputs = Input(shape=(5,))
-x = Dense(400,activation='linear')(inputs)
-preds = Dense(1,activation='linear')(x)
+inputs = Input(shape=(14,))
+x = Dense(400,activation='relu')(inputs)
+preds = Dense(1,activation='relu')(x)
 
 model_2 = Model(inputs=inputs,outputs=preds)
 #sgd=keras.optimezer.SGD()
@@ -85,7 +83,7 @@ Train Model
 """
 
 #Train the model
-hist = model_2.fit(train_data,train_targets,batch_size=10, epochs = 400)
+hist = model_2.fit(train_data,train_targets,batch_size=1, epochs = 400)
 
 #visualizing losses and accuracy
 num_epochs = 400
@@ -104,10 +102,11 @@ plt.style.use(['classic'])
 """
 normalize test data
 """
-test = tf.keras.utils.normalize(test, axis = -1, order = 2)
 
 test_targets = test['medianHomeVal']
 test_data = test.drop(['medianHomeVal'], axis = 1)
+
+test_data = tf.keras.utils.normalize(test_data, axis = -1, order = 2)
 
 test_data = np.array(test_data)
 test_targets = np.array(test_targets)
