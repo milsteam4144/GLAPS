@@ -26,7 +26,8 @@ path = os.path.abspath("MinorLeague.db")
 engine = sqlalchemy.create_engine("sqlite:///"+path, echo = False) 
 conn = engine.connect()
 df = pd.read_sql_table('Detailed', conn)
-df = df.drop(['locationID'], axis = 1)
+df = df.drop(['CountyCode'], axis = 1)
+
 
 #randomly takes half of the DB dataset and places it in train
 train = df.sample(frac = 0.5, random_state=700)

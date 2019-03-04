@@ -38,3 +38,19 @@ HTML_TEMPLATE = """<link rel="import" href="https://raw.githubusercontent.com/PA
         </script>"""
 html = HTML_TEMPLATE.format(jsonstr=jsonstr)
 display(HTML(html))
+
+# Clone the facets github repo to get access to the python feature stats generation code
+!git clone https://github.com/pair-code/facets.git
+
+# Add the path to the feature stats generation code.
+import sys
+sys.path.insert(0, '/content/facets/facets_overview/python/')
+
+# Create the feature stats for the datasets and stringify it.
+import base64
+from generic_feature_statistics_generator import GenericFeatureStatisticsGenerator
+
+gfsg = GenericFeatureStatisticsGenerator()
+proto = gfsg.ProtoFromDataFrames([{'name': 'train', 'table': train_data},
+                                  {'name': 'test', 'table': test_data}])
+protostr = base64.b64encode(proto.SerializeToString()).decode("utf-8")
