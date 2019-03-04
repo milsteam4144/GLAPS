@@ -27,29 +27,30 @@ engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid 
 conn = engine.connect()
 
 df = pd.read_sql_table('Detailed', conn)
-df = df.drop(['locationID'], axis = 1)
-df = df.drop(['year'], axis = 1)
+df = df[:800]
+df = df.drop(['CountyCode'], axis = 1)
+df = df.drop(['Year'], axis = 1)
+df['StateCode'] = pd.to_numeric(df['StateCode'],errors='coerce').fillna(0)
 
-#randomly takes 80% of the DB dataset and places it in train
-train = df.sample(frac = 0.7, random_state=700)
+#randomly takes 50% of the DB dataset and places it in train
+train = df.sample(frac = 0.5, random_state=700)
 
 #places remaining items in test db
 test = df.drop(train.index)
-print (test)
 
 """
 normalize train data
 """
 
-mean = train.mean()
-std = train.std()
-train = (train-mean)/std
-
-train.describe()
+train = tf.keras.utils.normalize(train, axis = -1, order = 2)
 
 """
 features
 """
+train_targets = train['medianHomeVal']
+train_data = train.drop(['medianHomeVal'], axis = 1)
+
+#makes data numpy arrays
 train_targets = train['medianHomeVal']
 train_data = train.drop(['medianHomeVal'], axis = 1)
 
@@ -69,8 +70,8 @@ model.add(Dense(1,input_dim=5, kernel_initializer='normal',activation='relu'))
 model.compile(loss='mse', optimizer='adam')
 """
 #uses functional API model
-inputs = Input(shape=(4,))
-preds = Dense(1,activation='linear')(inputs)
+inputs = Input(shape=(5,))
+preds = Dense(400,activation='linear')(inputs)
 
 model_2 = Model(inputs=inputs,outputs=preds)
 #sgd=keras.optimezer.SGD()
@@ -81,10 +82,10 @@ Train Model
 """
 
 #Train the model
-hist = model_2.fit(train_data,train_targets,batch_size=15, epochs = 490)
+hist = model_2.fit(train_data,train_targets,batch_size=15, epochs = 400)
 
 #visualizing losses and accuracy
-num_epochs = 490
+num_epochs = 400
 train_losses=hist.history['loss']
 xc=range(num_epochs)
 
@@ -100,9 +101,7 @@ plt.style.use(['classic'])
 """
 normalize test data
 """
-mean = test.mean()
-std = test.std()
-test = (test-mean)/std
+test = tf.keras.utils.normalize(test, axis = -1, order = 2)
 
 test_targets = test['medianHomeVal']
 test_data = test.drop(['medianHomeVal'], axis = 1)
@@ -118,9 +117,10 @@ test_targets_predicted = model_2.predict(test_data)
 print ('predicted_value: ', test_targets_predicted[1])
 print ('true_value: ', test_targets[1])
 
+"""
 print(test_targets_predicted[1]*std+mean)
 print(test_targets[1]*std+mean)
-"""
+
 for item in test_targets_predicted:
     print(item*std+mean)
 """

@@ -1,49 +1,35 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Feb 25 13:35:14 2019
 
-@author: canjurag4010
-"""
-import requests
-import json
-"""
-def countyCodesRandom():
-    allStatesandCounties = []
-    state_county = ()
-    
-    url = requests.get("https://api.census.gov/data/2011/acs/acs1?get=NAME,B01001_001E&for=county:*&in=state:*&key=c64b663f57b72887707719c1318350c2fb6f9146")
-    responseJson = list(json.loads(url.text))
-    
-    print(responseJson)
-    
-    for item in responseJson:
-        state_county = item[2],item[3]
-        if item[2] != '72':
-            allStatesandCounties.append(state_county)
-    
-    allStatesandCounties.pop(0)
+def w_sum(a,b):
+    assert(len(a) == len(b))
+    output = 0
+    for i in range(len(a)):
+        output += (a[i] * b[i])
+    return output
 
-countyCodesRandom()
-"""
-def getAllDetailedTCensusData(year, census_table):
-
-    DetailedTableData = []
-    AllCountiesDetailed = []
-       
-    if census_table.startswith('B'):
-        url = requests.get("https://api.census.gov/data/" + str(year) + "/acs/acs1/?get="+census_table+",NAME&for=county:*&in=state:*&key=c64b663f57b72887707719c1318350c2fb6f9146")
-        responseJson = list(json.loads(url.text))
-        
-        #print(responseJson)
-
-        for item in responseJson:
-            DetailedTableData=[item[0],item[1],item[2],item[3],item[4],item[6], item[7]]
-            
-            if item [6] != '72':
-                AllCountiesDetailed.append(DetailedTableData)
+weights = [0.1, 0.2, 0] 
     
-    AllCountiesDetailed.pop(0)
-    
-    print(AllCountiesDetailed)
+def neural_network(input, weights):
+    pred = w_sum(input,weights)
+    return pred
 
-getAllDetailedTCensusData(2011, 'B01003_001E,B25103_001E,B25105_001E,C25075_001E,B25077_001E')
+# This dataset is the current
+# status at the beginning of
+# each game for the first 4 games
+# in a season.
+
+# toes = current number of toes
+# wlrec = current games won (percent)
+# nfans = fan count (in millions)
+
+toes =  [8.5, 9.5, 9.9, 9.0]
+wlrec = [0.65, 0.8, 0.8, 0.9]
+nfans = [1.2, 1.3, 0.5, 1.0]
+
+# Input corresponds to every entry
+# for the first game of the season.
+
+print(toes[0])
+input = [toes[0],wlrec[0],nfans[0]]
+pred = neural_network(input,weights)
+
+print(pred)
