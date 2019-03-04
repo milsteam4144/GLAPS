@@ -34,7 +34,7 @@ df = df.drop(['StateAndCounty'], axis = 1)
 df['StateCode'] = pd.to_numeric(df['StateCode'],errors='coerce').fillna(0)
 
 #randomly takes 50% of the DB dataset and places it in train
-train = df.sample(frac = 0.6, random_state=800)
+train = df.sample(frac = 0.7, random_state=800)
 
 #places remaining items in test db
 test = df.drop(train.index)
@@ -71,7 +71,7 @@ model.compile(loss='mse', optimizer='adam')
 """
 #uses functional API model
 inputs = Input(shape=(14,))
-x = Dense(400,activation='relu')(inputs)
+x = Dense(560,activation='relu')(inputs)
 preds = Dense(1,activation='relu')(x)
 
 model_2 = Model(inputs=inputs,outputs=preds)
@@ -83,10 +83,10 @@ Train Model
 """
 
 #Train the model
-hist = model_2.fit(train_data,train_targets,batch_size=1, epochs = 400)
+hist = model_2.fit(train_data,train_targets,batch_size=1, epochs = 560)
 
 #visualizing losses and accuracy
-num_epochs = 400
+num_epochs = 560
 train_losses=hist.history['loss']
 xc=range(num_epochs)
 
@@ -128,4 +128,4 @@ for item in test_targets_predicted:
     print(item*std+mean)
 """
 test_mse_score, test_mae_score = model_2.evaluate(test_data, test_targets)
-print (test_mae_score)
+print (test_mae_score, test_mse_score)

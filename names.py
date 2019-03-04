@@ -13,7 +13,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.ion()
 from mpl_toolkits.mplot3d import Axes3D
-import tensorflow as tf
 import keras
 from keras.models import Sequential, Model, Input
 from keras.layers import Dense, Activation
@@ -26,9 +25,10 @@ engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid 
 #Link a session to the engine and initialize it
 conn = engine.connect()
 
-df = pd.read_sql_table('all_3_Data', conn)
-df1 = pd.read_sql_table ('States_Counties', conn)
+df = pd.read_sql_table('Detailed', conn)
 
-countyNames = df1.to_dict()
+df = df.reset_index(['StateCountyName','Year'])
+agroupDf=df.groupby(level='Year')
 
-print(countyNames)
+
+print(df1)
