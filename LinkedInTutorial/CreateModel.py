@@ -9,7 +9,7 @@ training_data_df = pd.read_csv("train_data_scaled.csv")
 X = training_data_df.drop('medianHomeVal', axis=1).values
 Y = training_data_df[['medianHomeVal']].values
 
-# Define the model
+# Define the mode
 model = Sequential()
 
 model.add(Dense(200, input_dim = 14, activation = 'relu'))

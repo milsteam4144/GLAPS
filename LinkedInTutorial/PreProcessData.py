@@ -29,6 +29,7 @@ scaler = MinMaxScaler(feature_range =(0,1))
 scaled_training = scaler.fit_transform(train_df)
 scaled_testing = scaler.transform(test_df)
 
+
 # Print out the adjustment that the scaler applied to the data num 2 is medHomeVal
 i = 0
 while i<15:
