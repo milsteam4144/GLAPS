@@ -2,68 +2,89 @@ from keras.models import load_model
 import os
 import pandas as pd
 from sqlalchemy import create_engine
+from sklearn.externals import joblib
 
-stateCountyString = 'Barrow County, Georgia'
-
-input = getPredictionInput(stateCountyString)
-
-#ToDo: scaledInput = PickledScalar(input)
-#ToDo: add if statement to change stadium to 1 or 09+
-
-
-path = os.path.abspath("model_4.h5")
-model = load_model(path)
-
-# Make a prediction with the neural network
-prediction = model.predict(scaledInput)
-
-# Grab just the first element of the first prediction (since that's the only have one)
-prediction = prediction[0][0]
-
-prediction = inverse_scalar(prediction)
-
-predictionS = model.predict(scaledInput)
-
-# Grab just the first element of the first prediction (since that's the only have one)
-predictionS = predictionS[0][0]
-
-predictionS = inverse_scalar(predictionS)
-
-
-print("Median Home Value with Stadium - ${}".format(predictionS))
-print("Median Home Value without Stadium - ${}".format(prediction))
-
-#Todo: determine calculation for the person's home can't think now
-
-print("Your Home Value with Stadium - ${}".format(prediction))
-print("Your Home Value without Stadium - ${}".format(prediction))
-
-def getStateandCountyCode(stateCountyString, conn):
-
-    df = pd.read_sql_table('State_Counties', conn)
-
-    line = df.loc[df['StateAndCounty'] == StateCountyString]
-
-    stateCode = line['StateCode']
-
-    countyCode = line['CountyCode']
-
-    return stateCode, countyCode
+#gets the line of current data from table to use for prediction
 
 def getPredictionInput(stateCountyString):
 
+    #gets table from db
     dbPath = os.path.abspath("MinorLeague.db")
     engine = create_engine("sqlite:///" + dbPath, echo=False)  # Set to false to git rid of log
     # Link a session to the engine and initialize it
     conn = engine.connect()
 
-    state, county = getStateandCountyCode(stateCountyString, conn)
-
     df = pd.read_sql_table('all_3_Data', conn)
 
-    df = df.drop(['medianHomeVal'], axis = 1)
+    #gets all lines with 2017
+    yrLines = df.loc[df['Year'] == 2017]
+    #gets line for specific county and state
+    line = yrLines.loc[yrLines['State_Cty'] == stateCountyString]
 
-    line = df.loc[df['StateCode'] == state and df['CountyCode'] == county]
+    #drops the unneeded columns
+    line = line.drop(['medianHomeVal', 'Year', 'State_Cty', 'CountyCode'], axis = 1)
 
     return line
 
+def prediction(stateCountyString, Homeval):
+
+    # takes string received from user and grabs corresponding line from DB
+    input = getPredictionInput(stateCountyString)
+
+    #loads the saved scalers that were used for the model
+    scaler_data = joblib.load("sc_data.save")
+    scaler_targets = joblib.load("sc_targets.save")
+
+    #gets the path for the model
+    path = os.path.abspath("model_2017_4.h5")
+
+    #loads the model
+    model = load_model(path)
+
+    scaledInput = scaler_data.transform(input)
+
+    if scaledInput[0][14] == 0:
+        # Make a prediction with the neural network
+        prediction = model.predict(scaledInput)
+
+        prediction = scaler_targets.inverse_transform(prediction)
+        # Grab just the first element of the first prediction (since that's the only have one)
+        prediction = (prediction[0][0])
+
+        #changes from not having stadium to having Stadium
+        scaledInput[0][14] = 1
+
+        predictionS = model.predict(scaledInput)
+
+        predictionS = scaler_targets.inverse_transform(predictionS)
+        predictionS = (predictionS[0][0])
+
+        HomevalS = Homeval*(1+(prediction-predictionS)/prediction);
+
+    elif scaledInput[0][14] == 1:
+
+        predictionS = model.predict(scaledInput)
+
+        predictionS = scaler_targets.inverse_transform(predictionS)
+        predictionS = (predictionS[0][0])
+
+        #changes to not having a stadium
+        scaledInput[0][14] = 0
+
+        # Make a prediction with the neural network
+        prediction = model.predict(scaledInput)
+
+        prediction = scaler_targets.inverse_transform(prediction)
+        # Grab just the first element of the first prediction (since that's the only have one)
+        prediction = (prediction[0][0])
+
+        Homeval = Homeval*(1+(predictionS - prediction)/predictionS)
+
+    print("Median Home Value with Stadium - ${}".format(predictionS))
+    print("Median Home Value without Stadium - ${}".format(prediction))
+    print("Your Home Value with Stadium - ${}".format(HomevalS))
+    print("Your Home Value without Stadium - ${}".format(Homeval))
+
+    return prediction, predictionS, Homeval, HomevalS
+
+prediction('Barrow County, Georgia', 150000)
