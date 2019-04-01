@@ -6,6 +6,7 @@ import keras
 from keras.models import Sequential
 from keras.layers import *
 from sklearn.externals import joblib
+import tensorflow as tf
 
 
 
@@ -109,7 +110,30 @@ print('The difference is: $',abs(actual_value - pred_value))
 
 model.save('model_2017.h5')
 
+model_builder = tf.saved_model.builder.SavedModelBuilder("exported_model")
 
+inputs = {
+    'input': tf.saved_model.utils.build_tensor_info(model.input)
+}
+outputs = {
+    'prediction': tf.saved_model.utils.build_tensor_info(model.output)
+}
+
+signature_def= tf.saved_model.signature_def_utils.build_signature_def(
+    inputs = inputs,
+    outputs = outputs,
+    method_name=tf.saved_model.signature_constants.predict_method_name
+)
+
+model_builder.add_meta_graph_and_variables(
+    k.get_session(),
+    tags=[tf.saved_model.tag_constants.SERVING],
+    signature_def_map={
+        tf.saved_model.signature_constant.DEFAULT_SERVING_SIGNATURE_DEF_KEY:signature_def
+    }
+)
+
+model_builder.save()
 
 
 

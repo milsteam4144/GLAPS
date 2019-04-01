@@ -24,7 +24,13 @@ def getPredictionInput(stateCountyString):
     #drops the unneeded columns
     line = line.drop(['medianHomeVal', 'Year', 'State_Cty', 'CountyCode'], axis = 1)
 
-    return line
+    # loads the saved scalers that were used for the model
+    scaler_data = joblib.load("sc_data.save")
+    scaler_targets = joblib.load("sc_targets.save")
+
+    scaledInput = scaler_data.transform(line)
+
+    return scaledInput
 
 def prediction(stateCountyString, Homeval):
     """
@@ -34,20 +40,17 @@ def prediction(stateCountyString, Homeval):
     f = h5py.File('Model_2017_4.h5', 'r')
     print(f.attrs.get('keras_version'))
     """
-    # takes string received from user and grabs corresponding line from DB
-    input = getPredictionInput(stateCountyString)
-
-    #loads the saved scalers that were used for the model
+    # loads the saved scalers that were used for the model
     scaler_data = joblib.load("sc_data.save")
     scaler_targets = joblib.load("sc_targets.save")
 
     #gets the path for the model
-    #path = os.path.abspath('model_2017.h5')
+    path = os.path.abspath('model_2017_4.h5')
 
     #loads the model
-    model = load_model('model_2017_4.h5')
+    model = load_model(path)
 
-    scaledInput = scaler_data.transform(input)
+    scaledInput = getPredictionInput(stateCountyString)
 
     if scaledInput[0][14] == 0:
         # Make a prediction with the neural network
@@ -65,7 +68,7 @@ def prediction(stateCountyString, Homeval):
         predictionS = scaler_targets.inverse_transform(predictionS)
         predictionS = (predictionS[0][0])
 
-        HomevalS = Homeval*(1+(predictionS-prediction)/prediction);
+        HomevalS = Homeval*(1+(prediction-predictionS)/prediction);
 
     elif scaledInput[0][14] == 1:
 
