@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-import Prediction
+import Prediction2
 
 app = Flask(__name__)
 
@@ -12,7 +12,7 @@ def GLAPS():
         homeValue = int(request.args['HomeVal'])
         stateCountyString = request.args['County']
 
-        prediction, predictionS, homeValue, homeValueS = Prediction.prediction(stateCountyString, homeValue)
+        prediction, predictionS, homeValue, homeValueS = Prediction2.prediction(stateCountyString, homeValue)
 
         prediction = int(prediction)
         predictionS = int(predictionS)
