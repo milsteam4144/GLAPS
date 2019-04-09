@@ -109,7 +109,8 @@ def prediction(stateCountyString, Homeval):
         predictionS = scaler_targets.inverse_transform(predictionS)
         predictionS = (predictionS[0][0])
 
-        HomevalS = Homeval*(1+(prediction-predictionS)/prediction);
+        # percent of change (V2-V1)/|V1|
+        HomevalS = HomevalS = Homeval*(1+((predictionS-prediction)/prediction))
 
     elif scaledInput[14] == 1:
 
@@ -130,7 +131,7 @@ def prediction(stateCountyString, Homeval):
         # Grab just the first element of the first prediction (since that's the only have one)
         prediction = (prediction[0][0])
 
-        Homeval = Homeval*(1+(predictionS - prediction)/predictionS)
+        Homeval = Homeval*(1+((prediction - predictionS)/predictionS))
 
     print("Median Home Value with Stadium - ${}".format(predictionS))
     print("Median Home Value without Stadium - ${}".format(prediction))
