@@ -9,12 +9,13 @@ from sklearn.externals import joblib
 import tensorflow as tf
 
 
-
+#obtains absolute path to folder to get db
 path = os.path.abspath("MinorLeague.db")
 engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid of log
 #Link a session to the engine and initialize it
 conn = engine.connect()
 
+#reads table and removes specified columns
 df = pd.read_sql_table('all_3_Data', conn)
 df = df[4898:]
 df = df.drop(['CountyCode'], axis = 1)
@@ -57,20 +58,6 @@ test_targets = sc_targets.transform(test_targets)
 joblib.dump(sc_data, "sc_data.save")
 joblib.dump(sc_targets, "sc_targets.save")
 
-'''
-#Save the scaler
-joblib.dump(scaler, "2017_scaler.save")
-
-# Create new pandas DataFrame objects from the scaled data
-scaled_train_df = pd.DataFrame(scaled_training, columns=train_df.columns.values)
-scaled_test_df = pd.DataFrame(scaled_testing, columns=test_df.columns.values)
-
-
-# Save scaled data dataframes to new CSV files
-scaled_train_df.to_csv("train_data_scaled.csv", index=False)
-scaled_test_df.to_csv("test_data_scaled.csv", index=False)
-'''
-
 # Define the model
 model = Sequential()
 model.add(Dense(200, input_dim=15, activation='relu'))
@@ -110,6 +97,9 @@ print('The difference is: $',abs(actual_value - pred_value))
 
 model.save('model_2017.h5')
 
+"""
+Creates google cloud model
+
 model_builder = tf.saved_model.builder.SavedModelBuilder("exported_model")
 
 inputs = {
@@ -134,6 +124,6 @@ model_builder.add_meta_graph_and_variables(
 )
 
 model_builder.save()
-
+"""
 
 

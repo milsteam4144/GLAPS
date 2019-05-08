@@ -21,7 +21,6 @@ from apis_3 import getCensusData, codesAndNames
 
 
 path = os.path.abspath("MinorLeague.db")
-#dir_path = os.path.dirname(os.path.realpath("/MinorLeague/MinorLeague.db"))
 #Define declarative base class
 Base = declarative_base()
 engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid of log
@@ -29,18 +28,13 @@ engine = create_engine("sqlite:///"+path, echo = False)#Set to false to git rid 
 conn = engine.connect()
 metadata = Base.metadata
 
-
 Session = sessionmaker(bind=engine)
 session = Session()
 
-
-#Upload the Stadiums table as a Table object
-stadiums = Table('Stadiums', metadata, autoload = True, autoload_with=engine)
+#Upload the CensusTables table as a Table object
 censusTables = Table('CensusTables',metadata, autoload = True, autoload_with=engine)
-#print(stadiums.columns)
 
 #The following are three tables with various attributes (columns)
-
 class Subject_T(Base):
     
     __tablename__ = "Subject"
@@ -118,22 +112,6 @@ class Detailed_T(Base):
             self.medianHouseholdCosts = medianHouseholdCosts
             self.totalHouses = totalHouses
             self.medianHomeVal = medianHomeVal
-       
-class Locations(Base):
-    
-    __tablename__ = "Locations"
-    __table_args__ = {'sqlite_autoincrement':True}
-    locationID = Column(Integer, primary_key = True)
-    countyCode = Column('CountyCode', String)
-    stateCode = Column('StateCode', String)
-    stadiumExists = Column('StadiumExists', Integer)
-    
-    def __init__(self, locationID, countyCode, stateCode, stadiumExists):
-        
-        self.locationID = locationID
-        self.countyCode = countyCode
-        self.stateCode = stateCode
-        self.stadiumExists = stadiumExists
 
 class StatesAndCounties_T(Base):
     
@@ -157,7 +135,6 @@ years = [2011, 2012, 2013, 2014, 2015, 2016, 2017]
 '''
 Gets string of table names needed for apis
 '''
-
 censusList = []
 for row1 in session.query(censusTables).all():
     censusList.append(row1.TableNames)
@@ -172,19 +149,6 @@ sends the info in list above to db
 '''
 for item in allStatesAndCounties:
     new = StatesAndCounties_T(stateAndCounty = item[0], countyCode = item[1], stateCode = item[2])
-    session.add(new)
-
-session.commit()
-session.flush()
-
-'''
-uses data above to create a table with location ID and eventually stadiums
-'''
-
-x = 0  
-for item in allStatesAndCounties: 
-    x += 1
-    new = Locations(locationID = x, countyCode = item[1], stateCode = item[2], stadiumExists = 0)
     session.add(new)
 
 session.commit()

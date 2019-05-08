@@ -13,7 +13,7 @@ def codesAndNames():
     
     for item in responseJson:
         state_county = item[0],item[3],item[2]
-        if item[2] != '72':
+        if item[2] != '72': # code 72 is puerto rico
             allStatesandCounties.append(state_county)
     
     allStatesandCounties.pop(0)
