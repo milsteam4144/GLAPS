@@ -5,7 +5,7 @@ Geographical Location Attribute Predictor System - Capstone Project using Python
 - U.S. Census Bureau
 
 # Developers
--Gabriela Canjura
+- Gabriela Canjura
 - Mallory Milstead
 
 # Built with:
