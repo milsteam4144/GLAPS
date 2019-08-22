@@ -7,6 +7,8 @@ Initially, the project's goal was to create a time-series forecasting model to p
 
 GLAPS uses a custom RESTful API to make the prediction and uses a Google Maps API to return strings for the County and State in a consistent format.
 
+Example call directly to API: http://gmastorg.pythonanywhere.com/GLAPS?HomeVal=150000&County=Cumberland%20County,%20North%20Carolina
+
 
 
 # Data Obtained from:
